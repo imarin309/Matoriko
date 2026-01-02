@@ -30,10 +30,6 @@
     @apply flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg shadow-md hover:bg-gray-800 transition-all;
   }
 
-  .btn-action {
-    @apply w-8 h-8 md:w-10 md:h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors;
-  }
-
   .btn-action-add {
     @apply w-8 h-8 md:w-10 md:h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors;
   }
@@ -44,15 +40,15 @@
 
   /* Main Content */
   .main-content {
-    @apply pt-24 pb-12 px-4 overflow-auto;
+    @apply pt-24 pb-12 px-4 overflow-auto min-h-[calc(100vh-96px)];
   }
 
   .main-content-container {
-    @apply max-w-7xl mx-auto;
+    @apply max-w-7xl mx-auto h-full;
   }
 
   .mindmap-wrapper {
-    @apply flex justify-center items-start;
+    @apply flex justify-center items-center h-full;
   }
 
   /* MindMap Node Components */
@@ -85,15 +81,15 @@
   }
 
   .node-text {
-    @apply text-gray-900 text-center break-words overflow-hidden;
+    @apply text-sm text-gray-900 text-center break-words overflow-hidden;
   }
 
   .node-input {
-    @apply w-full h-full bg-gray-50 text-gray-900 placeholder:text-gray-400 text-center rounded-lg px-2 outline-none border-2 border-gray-300 focus:border-gray-500;
+    @apply text-sm w-full h-full bg-gray-50 text-gray-900 placeholder:text-gray-400 text-center rounded-lg px-2 outline-none border-2 border-gray-300 focus:border-gray-500;
   }
 
-  .node-actions {
-    @apply absolute -bottom-3 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300;
+  .node-actions-outer {
+    @apply absolute top-full mt-3 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50;
   }
 
   /* Connection Lines */
