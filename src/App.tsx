@@ -1,69 +1,42 @@
 import { useState } from 'react';
 import { MindMapNode} from './components/MindMapNode';
 import { Header } from './components/header';
-import {type MindMapNodeData} from './domain/mindmap';
+import {
+  type MindMapNodeData,
+  addChildToNode,
+  deleteNodeById,
+  updateNodeTextById,
+  updateNodeById,
+} from './domain/mindmap';
 
 export default function App() {
   const [rootNode, setRootNode] = useState<MindMapNodeData>({
     id: 'root',
+    title: '',
     text: '',
     children: [],
   });
 
-  
   const addChild = (nodeId: string) => {
-    const newNode: MindMapNodeData = {
-      id: `node-${Date.now()}-${Math.random()}`,
-      text: '',
-      children: [],
-    };
-
-    const updateNode = (node: MindMapNodeData): MindMapNodeData => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          children: [...node.children, newNode],
-        };
-      }
-      return {
-        ...node,
-        children: node.children.map(updateNode),
-      };
-    };
-
-    setRootNode(updateNode(rootNode));
+    setRootNode(addChildToNode(rootNode, nodeId));
   };
 
   const deleteNode = (nodeId: string) => {
-    const removeNode = (node: MindMapNodeData): MindMapNodeData => {
-      return {
-        ...node,
-        children: node.children
-          .filter((child) => child.id !== nodeId)
-          .map(removeNode),
-      };
-    };
-
-    setRootNode(removeNode(rootNode));
+    setRootNode(deleteNodeById(rootNode, nodeId));
   };
 
   const updateNodeText = (nodeId: string, text: string) => {
-    const updateNode = (node: MindMapNodeData): MindMapNodeData => {
-      if (node.id === nodeId) {
-        return { ...node, text };
-      }
-      return {
-        ...node,
-        children: node.children.map(updateNode),
-      };
-    };
+    setRootNode(updateNodeTextById(rootNode, nodeId, text));
+  };
 
-    setRootNode(updateNode(rootNode));
+  const updateNode = (nodeId: string, updates: Partial<Pick<MindMapNodeData, 'title' | 'text'>>) => {
+    setRootNode(updateNodeById(rootNode, nodeId, updates));
   };
 
   const resetMindMap = () => {
     setRootNode({
       id: 'root',
+      title: '',
       text: '',
       children: [],
     });
@@ -82,6 +55,7 @@ export default function App() {
                 onAddChild={addChild}
                 onDelete={deleteNode}
                 onUpdateText={updateNodeText}
+                onUpdateNode={updateNode}
                 isRoot
               />
             </div>

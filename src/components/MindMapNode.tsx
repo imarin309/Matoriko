@@ -2,6 +2,7 @@ import { useState, memo } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type MindMapNodeData } from '../domain/mindmap';
+import { EditableField } from './EditableField';
 
 
 interface MindMapNodeProps {
@@ -9,6 +10,7 @@ interface MindMapNodeProps {
   onAddChild: (nodeId: string) => void;
   onDelete: (nodeId: string) => void;
   onUpdateText: (nodeId: string, text: string) => void;
+  onUpdateNode: (nodeId: string, updates: Partial<Pick<MindMapNodeData, 'title' | 'text'>>) => void;
   isRoot?: boolean;
   level?: number;
 }
@@ -18,41 +20,38 @@ export const MindMapNode = memo(({
   onAddChild,
   onDelete,
   onUpdateText,
+  onUpdateNode,
   isRoot = false,
   level = 0,
 }: MindMapNodeProps) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [editText, setEditText] = useState(node.text);
   const [isHovered, setIsHovered] = useState(false);
 
-  const handleSave = () => {
-    if (editText.trim()) {
-      onUpdateText(node.id, editText.trim());
-    }
-    setIsEditing(false);
-    setIsExpanded(false);
+  const handleTitleSave = (title: string) => {
+    onUpdateNode(node.id, { title });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && e.ctrlKey) {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      setEditText(node.text);
-      setIsEditing(false);
-      setIsExpanded(false);
-    }
+  const handleTextSave = (text: string) => {
+    onUpdateNode(node.id, { text });
   };
 
   const handleNodeClick = () => {
-    if (!isEditing) {
-      setIsExpanded(true);
-      setIsEditing(true);
-    }
+    setIsExpanded(!isExpanded);
   };
 
   return (
     <div className="node-container">
+      {/* オーバーレイ: 拡大時のみ表示 */}
+      {isExpanded && (
+        <div
+          className="node-overlay"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(false);
+          }}
+        />
+      )}
+
       <motion.div
         initial={{ scale: 0, opacity: 0, zIndex:10 }}
         animate={{
@@ -74,26 +73,23 @@ export const MindMapNode = memo(({
           <div className="node-glow" />
 
           <div className="node-content">
-            {isEditing ? (
-              <textarea
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                onBlur={handleSave}
-                onKeyDown={handleKeyDown}
-                className="node-input"
-                placeholder=""
-                autoFocus
-                rows={isExpanded ? 4 : 1}
-                style={{
-                  resize: 'none',
-                  minHeight: isExpanded ? '80px' : 'auto'
-                }}
+            <div className="node-display-container">
+              <EditableField
+                value={node.title}
+                onSave={handleTitleSave}
+                placeholder="タイトル"
+                fieldType="title"
+                disabled={!isExpanded}
               />
-            ) : (
-              <p className="node-text">
-                {node.text}
-              </p>
-            )}
+              <div className="node-divider" />
+              <EditableField
+                value={node.text}
+                onSave={handleTextSave}
+                placeholder="テキスト"
+                fieldType="text"
+                disabled={!isExpanded}
+              />
+            </div>
           </div>
         </div>
 
@@ -150,6 +146,7 @@ export const MindMapNode = memo(({
                   onAddChild={onAddChild}
                   onDelete={onDelete}
                   onUpdateText={onUpdateText}
+                  onUpdateNode={onUpdateNode}
                   level={level + 1}
                 />
               </div>
