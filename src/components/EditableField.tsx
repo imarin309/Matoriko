@@ -6,6 +6,8 @@ interface EditableFieldProps {
   placeholder: string;
   fieldType: 'title' | 'text';
   disabled?: boolean;
+  onRequestEdit?: () => void;
+  editTrigger?: number;
 }
 
 export const EditableField = ({
@@ -14,9 +16,19 @@ export const EditableField = ({
   placeholder,
   fieldType,
   disabled = false,
+  onRequestEdit,
+  editTrigger = 0,
 }: EditableFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
+  const [lastEditTrigger, setLastEditTrigger] = useState(0);
+
+  // editTriggerが変化したら編集モードに入る（レンダリング中の状態更新）
+  if (editTrigger > 0 && editTrigger !== lastEditTrigger && !disabled && !isEditing) {
+    setLastEditTrigger(editTrigger);
+    setIsEditing(true);
+    setEditValue(value);
+  }
 
   const handleSave = () => {
     onSave(editValue.trim());
@@ -34,12 +46,16 @@ export const EditableField = ({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    // disabledの時はクリックを親に伝播させる（ノード全体の拡大を優先）
+    e.stopPropagation();
+
+    // disabledの時は親に編集リクエストを通知
     if (disabled) {
+      if (onRequestEdit) {
+        onRequestEdit();
+      }
       return;
     }
 
-    e.stopPropagation();
     if (!isEditing) {
       setIsEditing(true);
       setEditValue(value);

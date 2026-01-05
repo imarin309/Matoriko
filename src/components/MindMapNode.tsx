@@ -26,6 +26,8 @@ export const MindMapNode = memo(({
 }: MindMapNodeProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [titleEditTrigger, setTitleEditTrigger] = useState(0);
+  const [textEditTrigger, setTextEditTrigger] = useState(0);
 
   const handleTitleSave = (title: string) => {
     onUpdateNode(node.id, { title });
@@ -37,6 +39,20 @@ export const MindMapNode = memo(({
 
   const handleNodeClick = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleTitleRequestEdit = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+    setTitleEditTrigger((prev) => prev + 1);
+  };
+
+  const handleTextRequestEdit = () => {
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
+    setTextEditTrigger((prev) => prev + 1);
   };
 
   return (
@@ -80,6 +96,8 @@ export const MindMapNode = memo(({
                 placeholder="タイトル"
                 fieldType="title"
                 disabled={!isExpanded}
+                onRequestEdit={handleTitleRequestEdit}
+                editTrigger={titleEditTrigger}
               />
               <div className="node-divider" />
               <EditableField
@@ -88,6 +106,8 @@ export const MindMapNode = memo(({
                 placeholder="テキスト"
                 fieldType="text"
                 disabled={!isExpanded}
+                onRequestEdit={handleTextRequestEdit}
+                editTrigger={textEditTrigger}
               />
             </div>
           </div>
