@@ -1,8 +1,10 @@
-import { useState, memo } from 'react';
+import { useState, memo, useRef, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type MindMapNodeData } from '../domain/mindmap';
 import { EditableField } from './EditableField';
+import { useIsMobile } from '../hooks/useIsMobile';
+import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
 
 interface MindMapNodeProps {
@@ -24,10 +26,44 @@ export const MindMapNode = memo(({
   isRoot = false,
   level = 0,
 }: MindMapNodeProps) => {
+  const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [titleEditTrigger, setTitleEditTrigger] = useState(0);
   const [textEditTrigger, setTextEditTrigger] = useState(0);
+  const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  // 拡大時の画面中央への移動量を計算
+  useEffect(() => {
+    if (isExpanded && nodeRef.current) {
+      const rect = nodeRef.current.getBoundingClientRect();
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const nodeCenterX = rect.left + rect.width / 2;
+      const nodeCenterY = rect.top + rect.height / 2;
+      setCenterOffset({
+        x: centerX - nodeCenterX,
+        y: centerY - nodeCenterY,
+      });
+    } else {
+      setCenterOffset({ x: 0, y: 0 });
+    }
+  }, [isExpanded]);
+
+  // スワイプジェスチャー（モバイルのみ、拡大していない時のみ）
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (isMobile && !isExpanded && !isRoot) {
+        onDelete(node.id);
+      }
+    },
+    onSwipeRight: () => {
+      if (isMobile && !isExpanded) {
+        onAddChild(node.id);
+      }
+    },
+  });
 
   const handleTitleSave = (title: string) => {
     onUpdateNode(node.id, { title });
@@ -69,22 +105,27 @@ export const MindMapNode = memo(({
       )}
 
       <motion.div
+        ref={nodeRef}
         initial={{ scale: 0, opacity: 0, zIndex:10 }}
         animate={{
-          scale: isExpanded ? 1.8 : 1,
+          scale: isExpanded ? (isMobile ? 2.5 : 3) : 1,
+          x: centerOffset.x,
+          y: centerOffset.y,
           opacity: 1,
-          zIndex: isExpanded ? 50 : isHovered ? 100 : 10
+          zIndex: isExpanded ? 200 : isHovered ? 50 : 10
         }}
         exit={{ scale: 0, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
         className="node-wrapper group"
         style={{ position: 'relative' }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={() => !isMobile && setIsHovered(true)}
+        onMouseLeave={() => !isMobile && setIsHovered(false)}
+        onTouchStart={() => isMobile && setIsHovered(true)}
       >
         <div
           className={`node-base ${isRoot ? 'node-root' : 'node-child'}`}
           onClick={handleNodeClick}
+          {...(isMobile ? swipeHandlers : {})}
         >
           <div className="node-glow" />
 
@@ -115,7 +156,7 @@ export const MindMapNode = memo(({
 
         {/* Buttons outside node */}
         {!isExpanded && (
-        <div className="node-actions-outer">
+        <div className={`node-actions-outer ${isMobile ? 'mobile-visible' : ''}`}>
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
