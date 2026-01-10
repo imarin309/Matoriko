@@ -31,11 +31,15 @@
   }
 
   .btn-action-add {
-    @apply w-8 h-8 md:w-10 md:h-10 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors;
+    @apply w-11 h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .btn-action-delete {
-    @apply w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500 shadow-lg flex items-center justify-center hover:bg-red-600 transition-colors;
+    @apply w-11 h-11 md:w-12 md:h-12 rounded-full bg-red-500 shadow-lg flex items-center justify-center hover:bg-red-600 transition-colors;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   /* Main Content */
@@ -44,21 +48,23 @@
   }
 
   .main-content-container {
-    @apply max-w-7xl mx-auto h-full;
+    @apply h-full;
+    min-width: min-content;
   }
 
   .mindmap-wrapper {
     @apply flex justify-center items-center h-full;
+    min-width: min-content;
   }
 
   /* MindMap Node Components */
   .node-container {
-    @apply flex flex-col items-center gap-4 md:gap-6;
+    @apply flex flex-col items-center gap-20 md:gap-24;
   }
 
   .node-overlay {
     @apply fixed top-0 left-0 right-0 bottom-0 bg-black/30 cursor-pointer;
-    z-index: 40;
+    z-index: 150;
   }
 
   .node-wrapper {
@@ -70,11 +76,11 @@
   }
 
   .node-root {
-    @apply w-40 h-40 md:w-48 md:h-48 bg-white border-2 border-blue-200;
+    @apply w-44 h-44 md:w-48 md:h-48 bg-white border-2 border-blue-200;
   }
 
   .node-child {
-    @apply w-32 h-32 md:w-36 md:h-36 bg-white border-2 border-blue-200 hover:scale-105;
+    @apply w-36 h-36 md:w-40 md:h-40 bg-white border-2 border-blue-200 hover:scale-105;
   }
 
   .node-glow {
@@ -125,13 +131,18 @@
     @apply absolute top-full mt-3 left-1/2 -translate-x-1/2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50;
   }
 
+  /* モバイル時は常にボタンを表示 */
+  .node-actions-outer.mobile-visible {
+    @apply opacity-100;
+  }
+
   /* Connection Lines */
   .connection-line-vertical {
-    @apply absolute top-0 left-1/2 -translate-x-1/2 w-px h-6 bg-gray-300 -translate-y-6;
+    @apply absolute top-0 left-1/2 -translate-x-1/2 w-px h-10 bg-gray-300 -translate-y-10;
   }
 
   .connection-line-to-parent {
-    @apply absolute bottom-full left-1/2 -translate-x-1/2 w-px h-6 bg-gray-300;
+    @apply absolute bottom-full left-1/2 -translate-x-1/2 w-px h-10 bg-gray-300;
   }
 
   /* Children Container */
@@ -140,7 +151,7 @@
   }
 
   .children-row {
-    @apply flex flex-wrap justify-center gap-4 md:gap-8 relative;
+    @apply flex flex-nowrap justify-center gap-4 md:gap-8 relative;
   }
 
   .child-wrapper {
@@ -153,7 +164,7 @@
   }
 
   .icon-md {
-    @apply w-4 h-4 md:w-5 md:h-5;
+    @apply w-5 h-5 md:w-6 md:h-6;
   }
 
   .icon-text {
