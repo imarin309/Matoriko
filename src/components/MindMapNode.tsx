@@ -1,10 +1,9 @@
 import { useState, memo, useRef, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { type MindMapNodeData } from '../domain/mindmap';
 import { EditableField } from './EditableField';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { useSwipeGesture } from '../hooks/useSwipeGesture';
 
 
 interface MindMapNodeProps {
@@ -33,6 +32,7 @@ export const MindMapNode = memo(({
   const [textEditTrigger, setTextEditTrigger] = useState(0);
   const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });
   const [expandScale, setExpandScale] = useState(2);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
   // 画面サイズに応じた拡大倍率を計算（画面の短い方の70%）
@@ -70,20 +70,6 @@ export const MindMapNode = memo(({
     }
   }, [isExpanded]);
 
-  // スワイプジェスチャー（モバイルのみ、拡大していない時のみ）
-  const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      if (isMobile && !isExpanded && !isRoot) {
-        onDelete(node.id);
-      }
-    },
-    onSwipeRight: () => {
-      if (isMobile && !isExpanded) {
-        onAddChild(node.id);
-      }
-    },
-  });
-
   const handleTitleSave = (title: string) => {
     onUpdateNode(node.id, { title });
   };
@@ -108,6 +94,19 @@ export const MindMapNode = memo(({
       setIsExpanded(true);
     }
     setTextEditTrigger((prev) => prev + 1);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteDialog(false);
+    onDelete(node.id);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
   };
 
   return (
@@ -144,7 +143,6 @@ export const MindMapNode = memo(({
         <div
           className={`node-base ${isRoot ? 'node-root' : 'node-child'}`}
           onClick={handleNodeClick}
-          {...(isMobile ? swipeHandlers : {})}
         >
           <div className="node-glow" />
 
@@ -196,7 +194,7 @@ export const MindMapNode = memo(({
               whileTap={{ scale: 0.9 }}
               onClick={(e) => {
                 e.stopPropagation();
-                onDelete(node.id);
+                handleDeleteClick();
               }}
               className="btn-action-delete"
               title="削除"
@@ -234,6 +232,52 @@ export const MindMapNode = memo(({
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AnimatePresence>
+        {showDeleteDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1100]"
+            onClick={handleCancelDelete}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4"
+            >
+              <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                削除の確認
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                削除してもいいですか？
+              </p>
+              <div className="flex gap-3 justify-end">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleCancelDelete}
+                  className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium"
+                >
+                  cancel
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleConfirmDelete}
+                  className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium"
+                >
+                  delete
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 });
