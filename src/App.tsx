@@ -9,6 +9,7 @@ import {
   updateNodeById,
   convertToMarkdown,
 } from './domain/mindmap';
+import { generateMindMapFileName } from './domain/fileName';
 
 export default function App() {
   const [rootNode, setRootNode] = useState<MindMapNodeData>({
@@ -45,11 +46,7 @@ export default function App() {
 
   const saveMindMap = () => {
     const markdown = convertToMarkdown(rootNode);
-    const title = rootNode.title || '無題';
-    const sanitizedTitle = title.replace(/[/\\:*?"<>|]/g, '');
-    const now = new Date();
-    const dateTime = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-    const fileName = `${sanitizedTitle}_${dateTime}.md`;
+    const fileName = generateMindMapFileName(rootNode.title);
 
     const blob = new Blob([markdown], { type: 'text/markdown' });
 
