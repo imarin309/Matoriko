@@ -32,7 +32,26 @@ export const MindMapNode = memo(({
   const [titleEditTrigger, setTitleEditTrigger] = useState(0);
   const [textEditTrigger, setTextEditTrigger] = useState(0);
   const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });
+  const [expandScale, setExpandScale] = useState(2);
   const nodeRef = useRef<HTMLDivElement>(null);
+
+  // 画面サイズに応じた拡大倍率を計算（画面の短い方の70%）
+  useEffect(() => {
+    const calculateScale = () => {
+      if (!nodeRef.current) return;
+
+      const viewportMin = Math.min(window.innerWidth, window.innerHeight);
+      const targetSize = viewportMin * 0.7;
+      const nodeSize = nodeRef.current.offsetWidth || (isRoot ? 176 : 144);
+      const scale = targetSize / nodeSize;
+
+      setExpandScale(scale);
+    };
+
+    calculateScale();
+    window.addEventListener('resize', calculateScale);
+    return () => window.removeEventListener('resize', calculateScale);
+  }, [isRoot]);
 
   // 拡大時の画面中央への移動量を計算
   useEffect(() => {
@@ -108,7 +127,7 @@ export const MindMapNode = memo(({
         ref={nodeRef}
         initial={{ scale: 0, opacity: 0, zIndex:10 }}
         animate={{
-          scale: isExpanded ? (isMobile ? 2.5 : 3) : 1,
+          scale: isExpanded ? expandScale : 1,
           x: centerOffset.x,
           y: centerOffset.y,
           opacity: 1,

@@ -14,11 +14,14 @@
 @layer components {
   /* Header Components */
   .app-header {
-    @apply fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-gray-200;
+    @apply fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm border-b border-gray-200;
   }
 
   .app-header-container {
     @apply max-w-7xl mx-auto px-4 py-4 flex items-center justify-between;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
   }
 
   .app-title {
@@ -44,7 +47,11 @@
 
   /* Main Content */
   .main-content {
-    @apply pt-24 pb-12 px-4 overflow-auto min-h-[calc(100vh-96px)];
+    @apply overflow-auto min-h-[calc(100vh-96px)];
+    padding-top: max(12rem, calc(6rem + env(safe-area-inset-top)));
+    padding-bottom: max(12rem, calc(3rem + env(safe-area-inset-bottom)));
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
   }
 
   .main-content-container {
