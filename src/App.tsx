@@ -86,7 +86,7 @@ export default function App() {
     }
   }, []);
 
-  // ピンチ操作でズーム
+  // ピンチ操作でズーム（トラックパッド）
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (e.ctrlKey) {
@@ -109,6 +109,58 @@ export default function App() {
       return () => mainContent.removeEventListener('wheel', handleWheel);
     }
   }, []);
+
+  // ピンチ操作でズーム（スマホタッチ）
+  useEffect(() => {
+    let initialDistance = 0;
+    let initialZoom = 0;
+
+    const getDistance = (touches: TouchList) => {
+      const touch1 = touches[0];
+      const touch2 = touches[1];
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        initialDistance = getDistance(e.touches);
+        initialZoom = zoom;
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && initialDistance > 0) {
+        e.preventDefault();
+        const currentDistance = getDistance(e.touches);
+        const scale = currentDistance / initialDistance;
+
+        setZoom(() => {
+          const newZoom = initialZoom * scale;
+          // 最小0.1倍、最大5倍
+          return Math.min(Math.max(newZoom, 0.1), 5);
+        });
+      }
+    };
+
+    const handleTouchEnd = () => {
+      initialDistance = 0;
+    };
+
+    const mainContent = mainContentRef.current;
+    if (mainContent) {
+      mainContent.addEventListener('touchstart', handleTouchStart, { passive: false });
+      mainContent.addEventListener('touchmove', handleTouchMove, { passive: false });
+      mainContent.addEventListener('touchend', handleTouchEnd);
+      return () => {
+        mainContent.removeEventListener('touchstart', handleTouchStart);
+        mainContent.removeEventListener('touchmove', handleTouchMove);
+        mainContent.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [zoom]);
 
   return (
     <div className="min-h-screen bg-gray-50">
