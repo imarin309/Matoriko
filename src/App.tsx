@@ -21,6 +21,12 @@ export default function App() {
   const [zoom, setZoom] = useState(0.8);
   const mainContentRef = useRef<HTMLDivElement>(null);
   const mindmapWrapperRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(zoom);
+
+  // zoomRefを常に最新の値に更新
+  useEffect(() => {
+    zoomRef.current = zoom;
+  }, [zoom]);
 
   const addChild = (nodeId: string) => {
     setRootNode(addChildToNode(rootNode, nodeId));
@@ -127,7 +133,7 @@ export default function App() {
       if (e.touches.length === 2) {
         e.preventDefault();
         initialDistance = getDistance(e.touches);
-        initialZoom = zoom;
+        initialZoom = zoomRef.current; // 最新のzoom値を使用
       }
     };
 
@@ -137,11 +143,10 @@ export default function App() {
         const currentDistance = getDistance(e.touches);
         const scale = currentDistance / initialDistance;
 
-        setZoom(() => {
-          const newZoom = initialZoom * scale;
-          // 最小0.1倍、最大5倍
-          return Math.min(Math.max(newZoom, 0.1), 5);
-        });
+        const newZoom = initialZoom * scale;
+        // 最小0.1倍、最大5倍
+        const clampedZoom = Math.min(Math.max(newZoom, 0.1), 5);
+        setZoom(clampedZoom);
       }
     };
 
@@ -160,7 +165,7 @@ export default function App() {
         mainContent.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [zoom]);
+  }, []); // 依存配列を空にして、イベントリスナーの再登録を防ぐ
 
   return (
     <div className="min-h-screen bg-gray-50">
