@@ -1,6 +1,6 @@
 {
   "name": "mind-dialy",
-  "short_name": "MindMap",
+  "short_name": "MindDialy",
   "description": "階層的なマインドマップWebアプリ",
   "start_url": "/",
   "display": "standalone",

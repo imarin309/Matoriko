@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MindMapNode} from './components/MindMapNode';
 import { Header } from './components/header';
 import {
@@ -18,6 +18,9 @@ export default function App() {
     text: '',
     children: [],
   });
+  const [zoom, setZoom] = useState(0.8);
+  const mainContentRef = useRef<HTMLDivElement>(null);
+  const mindmapWrapperRef = useRef<HTMLDivElement>(null);
 
   const addChild = (nodeId: string) => {
     setRootNode(addChildToNode(rootNode, nodeId));
@@ -65,13 +68,59 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
+  // 初期表示時にrootノードの位置にスクロール
+  useEffect(() => {
+    if (mainContentRef.current && mindmapWrapperRef.current) {
+      const mainContent = mainContentRef.current;
+      const wrapper = mindmapWrapperRef.current;
+
+      // 余白の中央にスクロール
+      const scrollX = (wrapper.scrollWidth - mainContent.clientWidth) / 2;
+      const scrollY = (wrapper.scrollHeight - mainContent.clientHeight) / 2;
+
+      mainContent.scrollTo({
+        left: scrollX,
+        top: scrollY,
+        behavior: 'auto',
+      });
+    }
+  }, []);
+
+  // ピンチ操作でズーム
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+
+        const zoomSpeed = 0.01;
+        const delta = -e.deltaY * zoomSpeed;
+
+        setZoom((prevZoom) => {
+          const newZoom = prevZoom + delta;
+          // 最小0.1倍、最大5倍
+          return Math.min(Math.max(newZoom, 0.1), 5);
+        });
+      }
+    };
+
+    const mainContent = mainContentRef.current;
+    if (mainContent) {
+      mainContent.addEventListener('wheel', handleWheel, { passive: false });
+      return () => mainContent.removeEventListener('wheel', handleWheel);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onReset={resetMindMap} onSave={saveMindMap} />
 
-      <div className="main-content">
+      <div className="main-content" ref={mainContentRef}>
         <div className="main-content-container">
-          <div className="mindmap-wrapper">
+          <div
+            className="mindmap-wrapper"
+            ref={mindmapWrapperRef}
+            style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+          >
             <div className="inline-block">
               <MindMapNode
                 node={rootNode}
