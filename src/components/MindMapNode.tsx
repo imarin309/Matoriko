@@ -1,5 +1,5 @@
 import { useState, memo, useRef, useEffect } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { type MindMapNodeData } from '../domain/mindmap';
 import { EditableField } from './EditableField';
@@ -79,7 +79,10 @@ export const MindMapNode = memo(({
   };
 
   const handleNodeClick = () => {
-    setIsExpanded(!isExpanded);
+    // 未拡大状態の時のみ拡大する（×ボタンでのみ解除可能）
+    if (!isExpanded) {
+      setIsExpanded(true);
+    }
   };
 
   const handleTitleRequestEdit = () => {
@@ -111,17 +114,6 @@ export const MindMapNode = memo(({
 
   return (
     <div className="node-container">
-      {/* オーバーレイ: 拡大時のみ表示 */}
-      {isExpanded && (
-        <div
-          className="node-overlay"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsExpanded(false);
-          }}
-        />
-      )}
-
       <motion.div
         ref={nodeRef}
         initial={{ scale: 0, opacity: 0, zIndex:10 }}
@@ -145,6 +137,25 @@ export const MindMapNode = memo(({
           onClick={handleNodeClick}
         >
           <div className="node-glow" />
+
+          {/* Close button - 拡大時のみ表示 */}
+          {isExpanded && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(false);
+              }}
+              className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gray-800 text-white shadow-lg flex items-center justify-center hover:bg-gray-700 transition-colors z-20"
+              title="閉じる"
+            >
+              <Minimize2 className="w-5 h-5" />
+            </motion.button>
+          )}
 
           <div className="node-content">
             <div className="node-display-container">
