@@ -7,7 +7,7 @@ interface EditableFieldProps {
   fieldType: 'title' | 'text';
   disabled?: boolean;
   onRequestEdit?: () => void;
-  editTrigger?: number;
+  isEdit?: boolean;
 }
 
 export const EditableField = ({
@@ -17,15 +17,15 @@ export const EditableField = ({
   fieldType,
   disabled = false,
   onRequestEdit,
-  editTrigger = 0,
+  isEdit = false,
 }: EditableFieldProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
-  const [lastEditTrigger, setLastEditTrigger] = useState(0);
+  const [isLastEdit, setIsLastEdit] = useState(false);
 
   // editTriggerが変化したら編集モードに入る（レンダリング中の状態更新）
-  if (editTrigger > 0 && editTrigger !== lastEditTrigger && !disabled && !isEditing) {
-    setLastEditTrigger(editTrigger);
+  if (isEdit !== isLastEdit && !disabled && !isEditing) {
+    setIsLastEdit(isEdit);
     setIsEditing(true);
     setEditValue(value);
   }

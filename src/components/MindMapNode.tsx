@@ -28,14 +28,14 @@ export const MindMapNode = memo(({
   const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [titleEditTrigger, setTitleEditTrigger] = useState(0);
-  const [textEditTrigger, setTextEditTrigger] = useState(0);
+  const [isTitleEdit, setIsTitleEdit] = useState(false);
+  const [isTextEdit, setIsTextEdit] = useState(false);
   const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });
   const [expandScale, setExpandScale] = useState(2);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  // 画面サイズに応じた拡大倍率を計算（画面の短い方の70%）
+  // 画面サイズに応じた拡大倍率を計算
   useEffect(() => {
     const calculateScale = () => {
       if (!nodeRef.current) return;
@@ -79,7 +79,6 @@ export const MindMapNode = memo(({
   };
 
   const handleNodeClick = () => {
-    // 未拡大状態の時のみ拡大する（×ボタンでのみ解除可能）
     if (!isExpanded) {
       setIsExpanded(true);
     }
@@ -89,14 +88,14 @@ export const MindMapNode = memo(({
     if (!isExpanded) {
       setIsExpanded(true);
     }
-    setTitleEditTrigger((prev) => prev + 1);
+    setIsTitleEdit((prev) => !prev);
   };
 
   const handleTextRequestEdit = () => {
     if (!isExpanded) {
       setIsExpanded(true);
     }
-    setTextEditTrigger((prev) => prev + 1);
+    setIsTextEdit((prev) => !prev);
   };
 
   const handleDeleteClick = () => {
@@ -166,7 +165,7 @@ export const MindMapNode = memo(({
                 fieldType="title"
                 disabled={!isExpanded}
                 onRequestEdit={handleTitleRequestEdit}
-                editTrigger={titleEditTrigger}
+                isEdit={isTitleEdit}
               />
               <div className="node-divider" />
               <EditableField
@@ -176,7 +175,7 @@ export const MindMapNode = memo(({
                 fieldType="text"
                 disabled={!isExpanded}
                 onRequestEdit={handleTextRequestEdit}
-                editTrigger={textEditTrigger}
+                isEdit={isTextEdit}
               />
             </div>
           </div>
