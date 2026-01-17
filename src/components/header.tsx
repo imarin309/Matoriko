@@ -31,7 +31,7 @@ export function Header({ onReset, onSave }: HeaderProps) {
             <img src="/icons/icon.png" alt="アイコン" className="w-12 h-12" />
             <div>
               <h1 className="app-title">
-                mind dialy
+                Matriko
               </h1>
             </div>
           </div>
