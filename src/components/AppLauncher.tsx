@@ -61,6 +61,14 @@ export function AppLauncher() {
               <span className="launcher-item-icon">📝</span>
               <span className="launcher-item-label">mind-memo</span>
             </Link>
+            <Link
+              to="/night-diary"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <span className="launcher-item-icon">🌙</span>
+              <span className="launcher-item-label">night-diary</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
