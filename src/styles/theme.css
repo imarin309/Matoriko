@@ -14,7 +14,7 @@
 @layer components {
   /* Header Components */
   .app-header {
-    @apply fixed top-0 left-0 right-0 z-[1000] bg-white shadow-sm border-b border-gray-200;
+    @apply fixed top-0 left-0 right-0 z-[1000] bg-white/60 backdrop-blur-sm shadow-sm border-b border-gray-200/60;
   }
 
   .app-header-container {
