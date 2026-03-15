@@ -15,13 +15,14 @@ export function NightDiaryPage() {
 
   const handleDownload = () => {
     const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = `diary-${date}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
+    URL.revokeObjectURL(url);
   };
 
   const handleReset = () => {
@@ -37,6 +38,7 @@ export function NightDiaryPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
+              aria-label="戻る"
               className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
             >
               <ArrowLeft size={18} />
@@ -71,7 +73,9 @@ export function NightDiaryPage() {
       {/* コンテンツ */}
       <div className="max-w-lg mx-auto px-4 pt-32 pb-16 flex flex-col gap-4">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-5 py-4">
+          <label htmlFor="diary-date" className="sr-only">日付</label>
           <input
+            id="diary-date"
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -80,7 +84,9 @@ export function NightDiaryPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-5 py-5">
+          <label htmlFor="diary-text" className="sr-only">日記</label>
           <textarea
+            id="diary-text"
             autoFocus
             className="w-full text-sm text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none min-h-[400px]"
             value={text}
