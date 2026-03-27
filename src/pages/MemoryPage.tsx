@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { EyeOff } from 'lucide-react';
 import { AppHeader } from '../components/header';
 
 interface MemoryEntry {
@@ -145,6 +146,7 @@ function formatDate(dateStr: string) {
 export function MemoryPage() {
   const [date, setDate] = useState(todayString());
   const [title, setTitle] = useState('');
+  const [isUIHidden, setIsUIHidden] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [entries, setEntries] = useState<MemoryEntry[]>(() => [
     { id: Date.now(), text: '', imageUrl: '/kamaboko.jpeg' },
@@ -195,7 +197,10 @@ export function MemoryPage() {
   }, []);
 
   return (
-    <div className="min-h-screen relative">
+    <div
+      className="min-h-screen relative"
+      onClick={isUIHidden ? () => setIsUIHidden(false) : undefined}
+    >
       {/* 背景 */}
       <div
         className="fixed inset-0 -z-10"
@@ -206,15 +211,32 @@ export function MemoryPage() {
       />
 
       {/* ヘッダー */}
-      <div className="app-header">
-        <AppHeader title="memory" isSubPage />
-      </div>
+      {!isUIHidden && (
+        <div className="app-header">
+          <AppHeader title="memory" isSubPage />
+          <div className="sub-toolbar">
+            <div className="sub-toolbar-container">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => { e.stopPropagation(); setIsUIHidden(true); }}
+                aria-label="UIを非表示"
+                className="btn-sub-action-ghost"
+              >
+                <EyeOff className="icon-sm" />
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* コンテンツ */}
       <div
         className="max-w-2xl mx-auto flex flex-col gap-6"
         style={{
-          paddingTop: 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
+          paddingTop: isUIHidden
+            ? 'max(2rem, env(safe-area-inset-top))'
+            : 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
           paddingBottom: 'max(4rem, env(safe-area-inset-bottom))',
           paddingLeft: 'max(1.25rem, env(safe-area-inset-left))',
           paddingRight: 'max(1.25rem, env(safe-area-inset-right))',
@@ -265,15 +287,17 @@ export function MemoryPage() {
         </AnimatePresence>
 
         {/* 追加ボタン */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={addEntry}
-          className="w-full py-4 rounded-3xl border-2 border-dashed text-amber-400 hover:text-amber-500 hover:border-amber-400 transition-colors duration-200 text-sm font-medium"
-          style={{ borderColor: '#f5deb3' }}
-        >
-          +
-        </motion.button>
+        {!isUIHidden && (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={addEntry}
+            className="w-full py-4 rounded-3xl border-2 border-dashed text-amber-400 hover:text-amber-500 hover:border-amber-400 transition-colors duration-200 text-sm font-medium"
+            style={{ borderColor: '#f5deb3' }}
+          >
+            +
+          </motion.button>
+        )}
       </div>
     </div>
   );
