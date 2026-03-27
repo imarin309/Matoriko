@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { motion } from 'motion/react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { AppHeader } from '../components/header';
 
 interface MemoryEntry {
@@ -128,7 +128,7 @@ function MemoryCard({
       {/* 削除ボタン */}
       <button
         onClick={() => onDelete(entry.id)}
-        className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-rose-400 text-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center text-sm hover:bg-rose-500"
+        className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-rose-400 text-white shadow-md opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200 flex items-center justify-center text-sm hover:bg-rose-500"
         aria-label="削除"
       >
         ×
@@ -181,6 +181,14 @@ export function MemoryPage() {
       return prev.filter((e) => e.id !== id);
     });
   };
+
+  useEffect(() => {
+    return () => {
+      entries.forEach((e) => {
+        if (e.imageUrl.startsWith('blob:')) URL.revokeObjectURL(e.imageUrl);
+      });
+    };
+  }, []);
 
   return (
     <div className="min-h-screen relative">
@@ -239,16 +247,18 @@ export function MemoryPage() {
         </div>
 
         {/* エントリーリスト */}
-        {entries.map((entry, index) => (
-          <MemoryCard
-            key={entry.id}
-            entry={entry}
-            index={index}
-            onTextChange={updateText}
-            onImageChange={updateImage}
-            onDelete={deleteEntry}
-          />
-        ))}
+        <AnimatePresence>
+          {entries.map((entry, index) => (
+            <MemoryCard
+              key={entry.id}
+              entry={entry}
+              index={index}
+              onTextChange={updateText}
+              onImageChange={updateImage}
+              onDelete={deleteEntry}
+            />
+          ))}
+        </AnimatePresence>
 
         {/* 追加ボタン */}
         <motion.button
