@@ -164,12 +164,22 @@ export function MemoryPage() {
 
   const updateImage = (id: number, imageUrl: string) => {
     setEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, imageUrl } : e))
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        if (e.imageUrl.startsWith('blob:')) URL.revokeObjectURL(e.imageUrl);
+        return { ...e, imageUrl };
+      })
     );
   };
 
   const deleteEntry = (id: number) => {
-    setEntries((prev) => prev.filter((e) => e.id !== id));
+    setEntries((prev) => {
+      const entry = prev.find((e) => e.id === id);
+      if (entry?.imageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(entry.imageUrl);
+      }
+      return prev.filter((e) => e.id !== id);
+    });
   };
 
   return (
