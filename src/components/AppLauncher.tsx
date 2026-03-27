@@ -54,6 +54,14 @@ export function AppLauncher() {
             className="launcher-dropdown"
           >
             <Link
+              to="/"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/icons/icon.png" alt="" className="w-5 h-5 shrink-0" />
+              <span className="launcher-item-label">Matriko</span>
+            </Link>
+            <Link
               to="/mind-memo"
               className="launcher-item"
               onClick={() => setShowLauncher(false)}

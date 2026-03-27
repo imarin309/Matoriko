@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Download, RotateCcw } from 'lucide-react';
-import { motion } from 'motion/react';
-import { AppLauncher } from '../components/AppLauncher';
+import { AppHeader } from '../components/header';
+import { NightDiaryActions } from '../components/NightDiaryActions';
 
 function todayString() {
   const d = new Date();
@@ -35,47 +33,15 @@ export function NightDiaryPage() {
       <div className="fixed inset-0 -z-10" style={{ backgroundImage: "url('/kamaboko.jpeg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
       {/* ヘッダー */}
       <div className="app-header">
-        <div className="app-header-container">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              aria-label="戻る"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
-            >
-              <ArrowLeft size={18} />
-            </Link>
-            <img src="/icons/icon.png" alt="アイコン" className="w-10 h-10" />
-            <h1 className="app-title">night-diary</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleDownload}
-              className="btn-reset"
-            >
-              <Download className="icon-sm" />
-              <span className="hidden md:inline">save</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleReset}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
-              aria-label="リセット"
-            >
-              <RotateCcw size={16} />
-            </motion.button>
-            <AppLauncher />
-          </div>
-        </div>
+        <AppHeader title="night-diary" isSubPage />
+        <NightDiaryActions onDownload={handleDownload} onReset={handleReset} />
       </div>
 
       {/* コンテンツ */}
       <div
         className="max-w-lg mx-auto flex flex-col gap-4"
         style={{
-          paddingTop: 'max(7rem, calc(5rem + env(safe-area-inset-top)))',
+          paddingTop: 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
           paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
