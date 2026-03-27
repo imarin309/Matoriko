@@ -72,7 +72,15 @@ export function NightDiaryPage() {
       </div>
 
       {/* コンテンツ */}
-      <div className="max-w-lg mx-auto px-4 pt-32 pb-16 flex flex-col gap-4">
+      <div
+        className="max-w-lg mx-auto flex flex-col gap-4"
+        style={{
+          paddingTop: 'max(7rem, calc(5rem + env(safe-area-inset-top)))',
+          paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+          paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+          paddingRight: 'max(1rem, env(safe-area-inset-right))',
+        }}
+      >
         <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/60 px-5 py-4">
           <label htmlFor="diary-date" className="sr-only">日付</label>
           <input
@@ -80,7 +88,7 @@ export function NightDiaryPage() {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full text-sm text-gray-800 focus:outline-none bg-transparent"
+            className="w-full text-base text-gray-800 focus:outline-none bg-transparent"
           />
         </div>
 
@@ -89,7 +97,8 @@ export function NightDiaryPage() {
           <textarea
             id="diary-text"
             autoFocus
-            className="w-full text-sm text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none min-h-[400px] bg-transparent"
+            className="w-full text-base text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none bg-transparent"
+            style={{ minHeight: 'calc(100dvh - 280px)' }}
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
