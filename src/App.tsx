@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MindMapNode} from './components/MindMapNode';
-import { Header } from './components/header';
+import { AppHeader } from './components/header';
+import { MindMapActions } from './components/MindMapActions';
 import {
   type MindMapNodeData,
   addChildToNode,
@@ -169,7 +170,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header onReset={resetMindMap} onSave={saveMindMap} />
+      <div className="app-header">
+        <AppHeader title="Matriko" />
+        <MindMapActions onSave={saveMindMap} onReset={resetMindMap} />
+      </div>
 
       <div className="main-content" ref={mainContentRef}>
         <div className="main-content-container">

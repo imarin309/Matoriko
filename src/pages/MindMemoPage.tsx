@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Download, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AppLauncher } from '../components/AppLauncher';
+import { AppHeader } from '../components/header';
+import { MindMemoActions } from '../components/MindMemoActions';
 
 interface FormState {
   situation: string;
@@ -160,38 +160,12 @@ ${form.rethink}
     <div className="min-h-screen bg-gray-50">
       {/* ヘッダー */}
       <div className="app-header">
-        <div className="app-header-container">
-          <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
-            >
-              <ArrowLeft size={18} />
-            </Link>
-            <img src="/icons/icon.png" alt="アイコン" className="w-10 h-10" />
-            <h1 className="app-title">mind-memo</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {done && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleDownload}
-                className="btn-reset"
-              >
-                <Download className="icon-sm" />
-                <span className="hidden md:inline">save</span>
-              </motion.button>
-            )}
-            <AppLauncher />
-          </div>
-        </div>
+        <AppHeader title="mind-memo" isSubPage />
+        <MindMemoActions done={done} onDownload={handleDownload} />
       </div>
 
       {/* コンテンツ */}
-      <div className="max-w-lg mx-auto px-4 pt-32 pb-16 flex flex-col gap-6">
+      <div className="max-w-lg mx-auto px-4 pb-16 flex flex-col gap-6" style={{ paddingTop: 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))' }}>
 
         {/* プログレスバー */}
         <div className="flex items-center gap-2">

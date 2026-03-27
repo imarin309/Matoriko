@@ -49,6 +49,25 @@
     @apply font-medium;
   }
 
+  /* Sub-toolbar */
+  .sub-toolbar {
+    @apply bg-white/30 backdrop-blur-sm border-t border-gray-200/60;
+  }
+
+  .sub-toolbar-container {
+    @apply max-w-7xl mx-auto py-1.5 flex items-center justify-end gap-1.5;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .btn-sub-action {
+    @apply flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-lg shadow-sm hover:bg-gray-800 transition-all;
+  }
+
+  .btn-sub-action-ghost {
+    @apply flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 rounded-lg hover:text-gray-900 hover:bg-white/60 transition-all;
+  }
+
   /* Button Components */
   .btn-reset {
     @apply flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg shadow-md hover:bg-gray-800 transition-all;
@@ -69,7 +88,7 @@
   /* Main Content */
   .main-content {
     @apply overflow-auto min-h-[calc(100vh-96px)];
-    padding-top: max(12rem, calc(6rem + env(safe-area-inset-top)));
+    padding-top: max(12rem, calc(8.5rem + env(safe-area-inset-top)));
     padding-bottom: max(12rem, calc(3rem + env(safe-area-inset-bottom)));
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
