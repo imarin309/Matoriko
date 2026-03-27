@@ -148,7 +148,7 @@ export function MemoryPage() {
   const [title, setTitle] = useState('');
   const [isUIHidden, setIsUIHidden] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
-  const [entries, setEntries] = useState<MemoryEntry[]>(() => [
+const [entries, setEntries] = useState<MemoryEntry[]>(() => [
     { id: Date.now(), text: '', imageUrl: '/kamaboko.jpeg' },
   ]);
   const entriesRef = useRef(entries);
@@ -250,19 +250,24 @@ export function MemoryPage() {
             borderColor: '#f5deb3',
           }}
         >
-          <button
-            onClick={() => dateInputRef.current?.showPicker()}
-            className="text-sm text-amber-600 mb-2 hover:text-amber-500 transition-colors text-left"
+          <div
+            className="relative inline-block mb-2 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              try { dateInputRef.current?.showPicker(); } catch { /* mobile unsupported */ }
+            }}
           >
-            {formatDate(date)}
-          </button>
-          <input
-            ref={dateInputRef}
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="sr-only"
-          />
+            <span className="text-sm text-amber-600 hover:text-amber-500 transition-colors pointer-events-none">
+              {formatDate(date)}
+            </span>
+            <input
+              ref={dateInputRef}
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="absolute inset-0 opacity-0 cursor-pointer w-full"
+            />
+          </div>
           <input
             type="text"
             value={title}
