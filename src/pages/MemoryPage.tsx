@@ -146,11 +146,13 @@ export function MemoryPage() {
   const [date, setDate] = useState(todayString());
   const [title, setTitle] = useState('');
   const dateInputRef = useRef<HTMLInputElement>(null);
-  const entriesRef = useRef(entries);
-  entriesRef.current = entries;
   const [entries, setEntries] = useState<MemoryEntry[]>(() => [
     { id: Date.now(), text: '', imageUrl: '/kamaboko.jpeg' },
   ]);
+  const entriesRef = useRef(entries);
+  useEffect(() => {
+    entriesRef.current = entries;
+  }, [entries]);
   const addEntry = () => {
     setEntries((prev) => [
       ...prev,
