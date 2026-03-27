@@ -77,6 +77,14 @@ export function AppLauncher() {
               <span className="launcher-item-icon">🌙</span>
               <span className="launcher-item-label">night-diary</span>
             </Link>
+            <Link
+              to="/memory"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/kamaboko.jpeg" alt="" className="w-5 h-5 shrink-0 rounded-sm object-cover" />
+              <span className="launcher-item-label">memory</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
