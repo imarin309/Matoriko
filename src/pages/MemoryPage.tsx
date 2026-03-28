@@ -110,8 +110,8 @@ function MemoryCard({
       transition={{ duration: 0.3 }}
       className="relative group"
     >
-      <div className="rounded-3xl p-5">
-        <div className="flex gap-4 items-start">
+      <div className="rounded-3xl p-2 sm:p-5">
+        <div className="flex gap-2 sm:gap-4 items-start">
           {isEven ? (
             <>
               {textBlock}
@@ -238,13 +238,13 @@ const [entries, setEntries] = useState<MemoryEntry[]>(() => [
             ? 'max(2rem, env(safe-area-inset-top))'
             : 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
           paddingBottom: 'max(4rem, env(safe-area-inset-bottom))',
-          paddingLeft: 'max(1.25rem, env(safe-area-inset-left))',
-          paddingRight: 'max(1.25rem, env(safe-area-inset-right))',
+          paddingLeft: 'max(0.5rem, env(safe-area-inset-left))',
+          paddingRight: 'max(0.5rem, env(safe-area-inset-right))',
         }}
       >
         {/* 日付 & タイトル */}
         <div
-          className="rounded-3xl px-6 py-5 shadow-sm border"
+          className="rounded-3xl px-4 py-4 sm:px-6 sm:py-5 shadow-sm border"
           style={{
             background: 'linear-gradient(135deg, #fff9f0 0%, #fffdf8 100%)',
             borderColor: '#f5deb3',
