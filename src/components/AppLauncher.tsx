@@ -54,19 +54,19 @@ export function AppLauncher() {
             className="launcher-dropdown"
           >
             <Link
-              to="/"
+              to="/mind-map"
               className="launcher-item"
               onClick={() => setShowLauncher(false)}
             >
               <img src="/icons/icon.png" alt="" className="w-5 h-5 shrink-0" />
-              <span className="launcher-item-label">Matriko</span>
+              <span className="launcher-item-label">mind-map</span>
             </Link>
             <Link
               to="/mind-memo"
               className="launcher-item"
               onClick={() => setShowLauncher(false)}
             >
-              <span className="launcher-item-icon">📝</span>
+              <img src="/anpan.png" alt="" className="w-5 h-5 shrink-0" />
               <span className="launcher-item-label">mind-memo</span>
             </Link>
             <Link

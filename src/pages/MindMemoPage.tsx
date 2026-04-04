@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppHeader } from '../components/header';
-import { MindMemoActions } from '../components/MindMemoActions';
+import { MindMemoActions } from '../components/mind-memo/MindMemoActions';
 
 interface FormState {
   situation: string;
