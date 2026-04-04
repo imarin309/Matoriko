@@ -5,7 +5,7 @@ import { AppHeader } from './components/header';
 const tools = [
   {
     to: '/mind-map',
-    icon: <img src="/icons/icon.png" alt="Matriko" className="w-10 h-10" />,
+    icon: <img src="/icons/icon.png" alt="Matoriko" className="w-10 h-10" />,
     label: 'mind-map',
     description: 'マインドマップ',
   },
