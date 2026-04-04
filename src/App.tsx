@@ -1,198 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
-import { MindMapNode} from './components/MindMapNode';
+import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { AppHeader } from './components/header';
-import { MindMapActions } from './components/MindMapActions';
-import {
-  type MindMapNodeData,
-  addChildToNode,
-  deleteNodeById,
-  updateNodeTextById,
-  updateNodeById,
-  convertToMarkdown,
-} from './domain/mindmap';
-import { generateMindMapFileName } from './domain/fileName';
+
+const tools = [
+  {
+    to: '/mind-map',
+    icon: <img src="/icons/icon.png" alt="Matriko" className="w-10 h-10" />,
+    label: 'mind-map',
+    description: 'マインドマップ',
+  },
+  {
+    to: '/mind-memo',
+    icon: <img src="/anpan.png" alt="mind-memo" className="w-10 h-10" />,
+    label: 'mind-memo',
+    description: 'コラム法',
+  },
+  {
+    to: '/night-diary',
+    icon: <span className="text-4xl leading-none">🌙</span>,
+    label: 'night-diary',
+    description: '夜日記',
+  },
+  {
+    to: '/memory',
+    icon: <img src="/kamaboko.jpeg" alt="memory" className="w-10 h-10 rounded-md object-cover" />,
+    label: 'memory',
+    description: '絵日記',
+  },
+];
 
 export default function App() {
-  const [rootNode, setRootNode] = useState<MindMapNodeData>({
-    id: 'root',
-    title: '',
-    text: '',
-    children: [],
-  });
-  const [zoom, setZoom] = useState(0.8);
-  const mainContentRef = useRef<HTMLDivElement>(null);
-  const mindmapWrapperRef = useRef<HTMLDivElement>(null);
-  const zoomRef = useRef(zoom);
-
-  // zoomRefを常に最新の値に更新
-  useEffect(() => {
-    zoomRef.current = zoom;
-  }, [zoom]);
-
-  const addChild = (nodeId: string) => {
-    setRootNode(addChildToNode(rootNode, nodeId));
-  };
-
-  const deleteNode = (nodeId: string) => {
-    setRootNode(deleteNodeById(rootNode, nodeId));
-  };
-
-  const updateNodeText = (nodeId: string, text: string) => {
-    setRootNode(updateNodeTextById(rootNode, nodeId, text));
-  };
-
-  const updateNode = (nodeId: string, updates: Partial<Pick<MindMapNodeData, 'title' | 'text'>>) => {
-    setRootNode(updateNodeById(rootNode, nodeId, updates));
-  };
-
-  const resetMindMap = () => {
-    setRootNode({
-      id: 'root',
-      title: '',
-      text: '',
-      children: [],
-    });
-  };
-
-  const saveMindMap = () => {
-    const markdown = convertToMarkdown(rootNode);
-    const fileName = generateMindMapFileName(rootNode.title);
-
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-
-    // ダウンロードリンクを作成
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-
-    // リンクをクリックしてダウンロード
-    document.body.appendChild(link);
-    link.click();
-
-    // クリーンアップ
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-  // 初期表示時にrootノードの位置にスクロール
-  useEffect(() => {
-    if (mainContentRef.current && mindmapWrapperRef.current) {
-      const mainContent = mainContentRef.current;
-      const wrapper = mindmapWrapperRef.current;
-
-      // 余白の中央にスクロール
-      const scrollX = (wrapper.scrollWidth - mainContent.clientWidth) / 2;
-      const scrollY = (wrapper.scrollHeight - mainContent.clientHeight) / 2;
-
-      mainContent.scrollTo({
-        left: scrollX,
-        top: scrollY,
-        behavior: 'auto',
-      });
-    }
-  }, []);
-
-  // ピンチ操作でズーム（トラックパッド）
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (e.ctrlKey) {
-        e.preventDefault();
-
-        const zoomSpeed = 0.01;
-        const delta = -e.deltaY * zoomSpeed;
-
-        setZoom((prevZoom) => {
-          const newZoom = prevZoom + delta;
-          // 最小0.1倍、最大5倍
-          return Math.min(Math.max(newZoom, 0.1), 5);
-        });
-      }
-    };
-
-    const mainContent = mainContentRef.current;
-    if (mainContent) {
-      mainContent.addEventListener('wheel', handleWheel, { passive: false });
-      return () => mainContent.removeEventListener('wheel', handleWheel);
-    }
-  }, []);
-
-  // ピンチ操作でズーム（スマホタッチ）
-  useEffect(() => {
-    let initialDistance = 0;
-    let initialZoom = 0;
-
-    const getDistance = (touches: TouchList) => {
-      const touch1 = touches[0];
-      const touch2 = touches[1];
-      const dx = touch2.clientX - touch1.clientX;
-      const dy = touch2.clientY - touch1.clientY;
-      return Math.sqrt(dx * dx + dy * dy);
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
-        initialDistance = getDistance(e.touches);
-        initialZoom = zoomRef.current; // 最新のzoom値を使用
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 2 && initialDistance > 0) {
-        e.preventDefault();
-        const currentDistance = getDistance(e.touches);
-        const scale = currentDistance / initialDistance;
-
-        const newZoom = initialZoom * scale;
-        // 最小0.1倍、最大5倍
-        const clampedZoom = Math.min(Math.max(newZoom, 0.1), 5);
-        setZoom(clampedZoom);
-      }
-    };
-
-    const handleTouchEnd = () => {
-      initialDistance = 0;
-    };
-
-    const mainContent = mainContentRef.current;
-    if (mainContent) {
-      mainContent.addEventListener('touchstart', handleTouchStart, { passive: false });
-      mainContent.addEventListener('touchmove', handleTouchMove, { passive: false });
-      mainContent.addEventListener('touchend', handleTouchEnd);
-      return () => {
-        mainContent.removeEventListener('touchstart', handleTouchStart);
-        mainContent.removeEventListener('touchmove', handleTouchMove);
-        mainContent.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, []); // 依存配列を空にして、イベントリスナーの再登録を防ぐ
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="app-header">
-        <AppHeader title="Matriko" />
-        <MindMapActions onSave={saveMindMap} onReset={resetMindMap} />
+        <AppHeader title="Matoriko" />
       </div>
 
-      <div className="main-content" ref={mainContentRef}>
-        <div className="main-content-container">
-          <div
-            className="mindmap-wrapper"
-            ref={mindmapWrapperRef}
-            style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
-          >
-            <div className="inline-block">
-              <MindMapNode
-                node={rootNode}
-                onAddChild={addChild}
-                onDelete={deleteNode}
-                onUpdateText={updateNodeText}
-                onUpdateNode={updateNode}
-                isRoot
-              />
-            </div>
-          </div>
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
+        <p className="text-gray-400 text-base tracking-widest text-center mb-8 font-light">自分の心を書き出すメモアプリ</p>
+        <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
+          {tools.map((tool) => (
+            <motion.div
+              key={tool.to}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <Link
+                to={tool.to}
+                className="flex flex-col items-center gap-2 p-6 bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+              >
+                {tool.icon}
+                <span className="font-semibold text-gray-900 text-sm">{tool.label}</span>
+                <span className="text-xs text-gray-500 text-center">{tool.description}</span>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </div>

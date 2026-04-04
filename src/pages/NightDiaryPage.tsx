@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AppHeader } from '../components/header';
-import { NightDiaryActions } from '../components/NightDiaryActions';
+import { NightDiaryActions } from '../components/night-diary/NightDiaryActions';
 
 function todayString() {
   const d = new Date();
