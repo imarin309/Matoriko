@@ -2,16 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EyeOff } from 'lucide-react';
 import { AppHeader } from '../components/header';
+import { todayString } from '../utils/date';
 
 interface MemoryEntry {
   id: number;
   text: string;
   imageUrl: string;
-}
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function ImageBlock({

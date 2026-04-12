@@ -9,8 +9,8 @@ import {
   updateNodeTextById,
   updateNodeById,
   convertToMarkdown,
-} from '../domain/mindmap';
-import { generateMindMapFileName } from '../domain/fileName';
+} from '../utils/mindmap';
+import { generateMindMapFileName } from '../utils/fileName';
 
 export function MindMapPage() {
   const [rootNode, setRootNode] = useState<MindMapNodeData>({

@@ -1,7 +1,7 @@
 import { useState, memo, useRef, useEffect } from 'react';
 import { Plus, Trash2, Minimize2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { type MindMapNodeData } from '../../domain/mindmap';
+import { type MindMapNodeData } from '../../utils/mindmap';
 import { EditableField } from './EditableField';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
