@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { AppHeader } from '../components/header';
 import { NightDiaryActions } from '../components/night-diary/NightDiaryActions';
-
-function todayString() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+import { todayString } from '../utils/date';
 
 export function NightDiaryPage() {
   const [date, setDate] = useState(todayString());
