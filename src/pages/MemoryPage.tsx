@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EyeOff } from 'lucide-react';
 import { AppHeader } from '../components/header';
@@ -76,19 +76,24 @@ function MemoryCard({
   onDelete: (id: number) => void;
 }) {
   const isEven = index % 2 === 0;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [entry.text]);
 
   const textBlock = (
     <div className="flex-1">
       <textarea
+        ref={textareaRef}
         className="w-full bg-transparent text-gray-700 placeholder:text-gray-300 resize-none focus:outline-none text-base leading-relaxed overflow-hidden"
         style={{ minHeight: '160px' }}
         placeholder="＿φ(￣ー￣ )"
         value={entry.text}
-        onChange={(e) => {
-          e.target.style.height = 'auto';
-          e.target.style.height = `${e.target.scrollHeight}px`;
-          onTextChange(entry.id, e.target.value);
-        }}
+        onChange={(e) => onTextChange(entry.id, e.target.value)}
       />
     </div>
   );
