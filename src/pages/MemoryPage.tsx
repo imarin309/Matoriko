@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EyeOff } from 'lucide-react';
 import { AppHeader } from '../components/header';
@@ -76,11 +76,20 @@ function MemoryCard({
   onDelete: (id: number) => void;
 }) {
   const isEven = index % 2 === 0;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [entry.text]);
 
   const textBlock = (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1">
       <textarea
-        className="flex-1 w-full bg-transparent text-gray-700 placeholder:text-gray-300 resize-none focus:outline-none text-base leading-relaxed"
+        ref={textareaRef}
+        className="w-full bg-transparent text-gray-700 placeholder:text-gray-300 resize-none focus:outline-none text-base leading-relaxed overflow-hidden"
         style={{ minHeight: '160px' }}
         placeholder="＿φ(￣ー￣ )"
         value={entry.text}
@@ -107,7 +116,7 @@ function MemoryCard({
       className="relative group"
     >
       <div className="rounded-3xl p-2 sm:p-5">
-        <div className="flex gap-2 sm:gap-4 items-start">
+        <div className="flex gap-2 sm:gap-4 items-center">
           {isEven ? (
             <>
               {textBlock}
@@ -247,13 +256,13 @@ const [entries, setEntries] = useState<MemoryEntry[]>(() => [
           }}
         >
           <div
-            className="relative inline-block mb-2 cursor-pointer"
+            className={`relative inline-block cursor-pointer ${!isUIHidden || title ? 'mb-2' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               try { dateInputRef.current?.showPicker(); } catch { /* mobile unsupported */ }
             }}
           >
-            <span className="text-sm text-amber-600 hover:text-amber-500 transition-colors pointer-events-none">
+            <span className="text-base font-semibold text-amber-600 hover:text-amber-500 transition-colors pointer-events-none">
               {formatDate(date)}
             </span>
             <input
@@ -264,13 +273,15 @@ const [entries, setEntries] = useState<MemoryEntry[]>(() => [
               className="absolute inset-0 opacity-0 cursor-pointer w-full"
             />
           </div>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="タイトル"
-            className="w-full text-2xl font-bold text-gray-800 placeholder:text-gray-300 bg-transparent focus:outline-none"
-          />
+          {(!isUIHidden || title) && (
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder={isUIHidden ? '' : 'タイトル'}
+              className="w-full text-2xl font-bold text-gray-800 placeholder:text-gray-300 bg-transparent focus:outline-none"
+            />
+          )}
         </div>
 
         {/* エントリーリスト */}
