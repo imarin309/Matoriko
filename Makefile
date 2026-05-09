@@ -17,30 +17,30 @@ help:
 
 # 依存関係のインストール
 install:
-	npm install
+	pnpm install
 
 # ESLintでコードをチェック
 lint:
-	npm run lint
+	pnpm run lint
 
 # ESLintで自動修正
 format:
-	npm run lint -- --fix
+	pnpm run lint -- --fix
 
 # 開発サーバーを起動
 exe:
-	npm run dev
+	pnpm run dev
 
 # 開発サーバーを起動（エイリアス）
 dev: exe
 
 # プロダクションビルド
 build:
-	npm run build
+	pnpm run build
 
 # ビルド後のプレビュー
 preview:
-	npm run preview
+	pnpm run preview
 
 # ビルド成果物を削除
 clean:

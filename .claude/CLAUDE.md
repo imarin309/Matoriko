@@ -16,25 +16,25 @@ React、TypeScript、Viteで構築されたWebアプリケーション。React R
 
 ### 開発
 ```bash
-npm run dev          # 開発サーバーを起動
+pnpm dev             # 開発サーバーを起動
 make exe             # 開発サーバーを起動（代替）
 ```
 
 ### ビルド & プレビュー
 ```bash
-npm run build        # 型チェックとプロダクションビルド
-npm run preview      # プロダクションビルドをプレビュー
+pnpm build           # 型チェックとプロダクションビルド
+pnpm preview         # プロダクションビルドをプレビュー
 ```
 
 ### コード品質
 ```bash
-npm run lint         # ESLintを実行
+pnpm lint            # ESLintを実行
 make format          # ESLintで自動修正（--fix）
 ```
 
 ### その他
 ```bash
-npm install          # 依存関係をインストール
+pnpm install         # 依存関係をインストール
 make clean           # ビルド成果物を削除（dist、dist-ssr、.viteキャッシュ）
 ```
 
