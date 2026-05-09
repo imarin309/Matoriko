@@ -3,13 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "eslint . --fix",
     "preview": "vite preview",
-    "update": "npx npm-check-updates -u --pre false && npm install && npm audit fix"
+    "update": "pnpm dlx npm-check-updates -u --pre false && pnpm install && pnpm audit --fix"
   },
   "dependencies": {
     "lucide-react": "^1.7.0",
