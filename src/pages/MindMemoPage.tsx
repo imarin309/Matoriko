@@ -193,7 +193,7 @@ ${form.rethink}
               {/* あんぱん＋吹き出し */}
               <div className="flex items-start gap-4">
                 <img
-                  src="/anpan.png"
+                  src="/assets/anpan.png"
                   alt="あんぱん"
                   className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 shrink-0 mt-1"
                 />
@@ -276,7 +276,7 @@ ${form.rethink}
               {/* 完了メッセージ */}
               <div className="flex items-start gap-4">
                 <img
-                  src="/anpan.png"
+                  src="/assets/anpan.png"
                   alt="あんぱん"
                   className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 shrink-0 mt-1"
                 />

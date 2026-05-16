@@ -26,7 +26,7 @@ export function NightDiaryPage() {
 
   return (
     <div className="min-h-screen relative">
-      <div className="fixed inset-0 -z-10" style={{ backgroundImage: "url('/kamaboko.jpeg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+      <div className="fixed inset-0 -z-10" style={{ backgroundImage: "url('/assets/kamaboko.jpeg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
       {/* ヘッダー */}
       <div className="app-header">
         <AppHeader title="night-diary" isSubPage />

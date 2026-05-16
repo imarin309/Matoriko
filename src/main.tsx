@@ -5,6 +5,7 @@ import { MindMapPage } from "./pages/MindMapPage.tsx";
 import { MindMemoPage } from "./pages/MindMemoPage.tsx";
 import { NightDiaryPage } from "./pages/NightDiaryPage.tsx";
 import { MemoryPage } from "./pages/MemoryPage.tsx";
+import { TravelItineraryPage } from "./pages/TravelItineraryPage.tsx";
 import "./styles/index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -15,6 +16,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/mind-memo" element={<MindMemoPage />} />
       <Route path="/night-diary" element={<NightDiaryPage />} />
       <Route path="/memory" element={<MemoryPage />} />
+      <Route path="/travel" element={<TravelItineraryPage />} />
     </Routes>
   </BrowserRouter>
 );

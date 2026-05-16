@@ -154,7 +154,7 @@ export function MemoryPage() {
   const [isUIHidden, setIsUIHidden] = useState(false);
   const dateInputRef = useRef<HTMLInputElement>(null);
 const [entries, setEntries] = useState<MemoryEntry[]>(() => [
-    { id: Date.now(), text: '', imageUrl: '/kamaboko.jpeg' },
+    { id: Date.now(), text: '', imageUrl: '/assets/kamaboko.jpeg' },
   ]);
   const entriesRef = useRef(entries);
   useEffect(() => {
@@ -163,7 +163,7 @@ const [entries, setEntries] = useState<MemoryEntry[]>(() => [
   const addEntry = () => {
     setEntries((prev) => [
       ...prev,
-      { id: Date.now() + Math.random(), text: '', imageUrl: '/kamaboko.jpeg' },
+      { id: Date.now() + Math.random(), text: '', imageUrl: '/assets/kamaboko.jpeg' },
     ]);
   };
 
