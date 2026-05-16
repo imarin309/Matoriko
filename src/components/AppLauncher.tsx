@@ -66,7 +66,7 @@ export function AppLauncher() {
               className="launcher-item"
               onClick={() => setShowLauncher(false)}
             >
-              <img src="/anpan.png" alt="" className="w-5 h-5 shrink-0" />
+              <img src="/assets/anpan.png" alt="" className="w-5 h-5 shrink-0" />
               <span className="launcher-item-label">mind-memo</span>
             </Link>
             <Link
@@ -82,8 +82,16 @@ export function AppLauncher() {
               className="launcher-item"
               onClick={() => setShowLauncher(false)}
             >
-              <img src="/kamaboko.jpeg" alt="" className="w-5 h-5 shrink-0 rounded-sm object-cover" />
+              <img src="/assets/kamaboko.jpeg" alt="" className="w-5 h-5 shrink-0 rounded-sm object-cover" />
               <span className="launcher-item-label">memory</span>
+            </Link>
+            <Link
+              to="/travel"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/assets/travel_anpan.png" alt="" className="w-5 h-5 shrink-0" />
+              <span className="launcher-item-label">travel</span>
             </Link>
           </motion.div>
         )}

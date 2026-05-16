@@ -11,7 +11,7 @@ const tools = [
   },
   {
     to: '/mind-memo',
-    icon: <img src="/anpan.png" alt="mind-memo" className="w-10 h-10" />,
+    icon: <img src="/assets/anpan.png" alt="mind-memo" className="w-10 h-10" />,
     label: 'mind-memo',
     description: 'コラム法',
   },
@@ -23,9 +23,15 @@ const tools = [
   },
   {
     to: '/memory',
-    icon: <img src="/kamaboko.jpeg" alt="memory" className="w-10 h-10 rounded-md object-cover" />,
+    icon: <img src="/assets/kamaboko.jpeg" alt="memory" className="w-10 h-10 rounded-md object-cover" />,
     label: 'memory',
     description: '絵日記',
+  },
+  {
+    to: '/travel',
+    icon: <img src="/assets/travel_anpan.png" alt="travel" className="w-10 h-10" />,
+    label: 'travel',
+    description: '旅のしおり',
   },
 ];
 
