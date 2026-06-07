@@ -33,6 +33,12 @@ const tools = [
     label: 'travel',
     description: '旅のしおり',
   },
+  {
+    to: '/message',
+    icon: <img src="/assets/anpan/funny.png" alt="message" className="w-10 h-10 object-cover" />,
+    label: 'message',
+    description: 'メッセージカード',
+  },
 ];
 
 export default function App() {
