@@ -56,10 +56,11 @@ export async function savePng(canvas: HTMLCanvasElement, filename = 'image.png')
   const isChrome = /CriOS/.test(ua);
 
   if (isIOS && isChrome) {
-    // Chrome iOS はネイティブシェートが使えないので新しいタブで開く
+    // Chrome iOS はネイティブシェアが使えないので新しいタブで開く
     // → 画像を長押し →「写真に追加」で保存
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
     return;
   }
 
