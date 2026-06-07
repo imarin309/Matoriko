@@ -312,8 +312,6 @@ export function MemoryPage() {
     };
   }, []);
 
-  const groups = chunk(entries, 3);
-
   const handleDownload = async () => {
     if (isDownloading) return;
     setIsDownloading(true);
@@ -397,42 +395,34 @@ export function MemoryPage() {
           />
         </div>
 
-        {/* グループリスト（3エントリで1カード） */}
-        <AnimatePresence>
-          {groups.map((group, groupIndex) => (
-            <motion.div
-              key={groupIndex}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="rounded-3xl border shadow-sm overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #fffdf8 0%, #fdf5ff 100%)',
-                borderColor: '#f5deb3',
-              }}
-            >
-              <AnimatePresence>
-                {group.map((entry, localIndex) => (
-                  <motion.div key={entry.id} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-                    <MemoryCard
-                      entry={entry}
-                      localIndex={localIndex}
-                      onTextChange={updateText}
-                      onImageChange={updateImage}
-                      onDelete={deleteEntry}
-                    />
-                    {localIndex < group.length - 1 && (
-                      <div
-                        className="mx-4 border-t"
-                        style={{ borderColor: 'rgba(245, 222, 179, 0.6)' }}
-                      />
-                    )}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {/* エントリリスト（全て1カード） */}
+        <div
+          className="rounded-3xl border shadow-sm overflow-hidden"
+          style={{
+            background: 'linear-gradient(135deg, #fffdf8 0%, #fdf5ff 100%)',
+            borderColor: '#f5deb3',
+          }}
+        >
+          <AnimatePresence>
+            {entries.map((entry, index) => (
+              <motion.div key={entry.id} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+                <MemoryCard
+                  entry={entry}
+                  localIndex={index}
+                  onTextChange={updateText}
+                  onImageChange={updateImage}
+                  onDelete={deleteEntry}
+                />
+                {index < entries.length - 1 && (
+                  <div
+                    className="mx-4 border-t"
+                    style={{ borderColor: 'rgba(245, 222, 179, 0.6)' }}
+                  />
+                )}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
 
         {/* 追加ボタン */}
         <motion.button
