@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Download } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AppHeader } from '../components/header';
-import { loadImage, roundedRect, wrapText, savePng } from '../utils/downloadImage';
+import { loadImage, roundedRect, wrapText, saveImage } from '../utils/downloadImage';
 
 type FontStyle = 'apology' | 'pop';
 
@@ -104,7 +104,7 @@ async function downloadCard(params: {
     lines.forEach((line, i) => ctx.fillText(line, cx, msgY + i * lineH, textMaxW));
   }
 
-  await savePng(canvas, 'message-card.png');
+  await saveImage(canvas, 'message-card.jpg');
 }
 
 export function MessageCardPage() {

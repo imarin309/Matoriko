@@ -43,21 +43,29 @@ export function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: numb
   return result;
 }
 
-// canvas の内容を PNG として保存
-// iOS Safari: Web Share API → 「写真に保存」が出る
-// iOS Chrome(CriOS)・Android・PC: <a download> でファイル保存
-export async function savePng(canvas: HTMLCanvasElement, filename = 'image.png') {
-  const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((b) => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/png')
-  );
+type SaveOptions = {
+  mime?:    'image/jpeg' | 'image/png';
+  quality?: number; // 0.0〜1.0（jpeg のみ有効）
+};
 
+// canvas の内容を画像として保存
+// iOS Safari: Web Share API → シェアシートの「写真に保存」
+// iOS Chrome: blob URL → 新しいタブで開き長押し保存
+// Android・PC: <a download>
+export async function saveImage(
+  canvas: HTMLCanvasElement,
+  filename = 'image.jpg',
+  { mime = 'image/jpeg', quality = 0.85 }: SaveOptions = {}
+) {
   const ua       = navigator.userAgent;
   const isIOS    = /iPad|iPhone|iPod/.test(ua);
   const isChrome = /CriOS/.test(ua);
 
+  const blob = await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob((b) => b ? resolve(b) : reject(new Error('toBlob failed')), mime, quality)
+  );
+
   if (isIOS && isChrome) {
-    // Chrome iOS はネイティブシェアが使えないので新しいタブで開く
-    // → 画像を長押し →「写真に追加」で保存
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 10000);
@@ -65,7 +73,7 @@ export async function savePng(canvas: HTMLCanvasElement, filename = 'image.png')
   }
 
   if (isIOS) {
-    const file = new File([blob], filename, { type: 'image/png' });
+    const file = new File([blob], filename, { type: mime });
     if (navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file] });
       return;
