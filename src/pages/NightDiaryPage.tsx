@@ -5,6 +5,7 @@ import { todayString } from '../utils/date';
 import { PocketTagList } from '../components/night-diary/PocketTagList';
 import type { PocketTagData } from '../components/night-diary/pocket-tag-types';
 import { PlusCircle, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const COLORS = [
   'bg-blue-100/40',
@@ -22,6 +23,7 @@ export function NightDiaryPage() {
   const [text, setText] = useState('');
   const [quickInput, setQuickInput] = useState('');
   const [pocketTags, setPocketTags] = useState<PocketTagData[]>([]);
+  const [showTagInput, setShowTagInput] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const currentDateValue = dateType === 'day' ? date : month;
@@ -64,6 +66,8 @@ export function NightDiaryPage() {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       e.preventDefault();
       addPocketTag();
+    } else if (e.key === 'Escape') {
+      setShowTagInput(false);
     }
   };
 
@@ -84,7 +88,44 @@ export function NightDiaryPage() {
       
       <div className="app-header z-[1000]">
         <AppHeader title="night-diary" isSubPage />
-        <NightDiaryActions onDownload={handleDownload} onReset={handleReset} />
+        <NightDiaryActions
+          onDownload={handleDownload}
+          onReset={handleReset}
+          onToggleTag={() => setShowTagInput(!showTagInput)}
+          isTagActive={showTagInput}
+        />
+        <AnimatePresence>
+          {showTagInput && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden border-t border-gray-200/60 bg-white/60 backdrop-blur-sm"
+            >
+              <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
+                <div className="flex-1 relative bg-white/70 backdrop-blur-sm rounded-full shadow-sm border border-gray-200/60 px-4 py-1.5">
+                  <input
+                    type="text"
+                    value={quickInput}
+                    onChange={(e) => setQuickInput(e.target.value)}
+                    onKeyDown={handleQuickSubmit}
+                    placeholder="浮かんだ言葉をポケットへ..."
+                    className="w-full bg-transparent text-sm text-gray-800 focus:outline-none placeholder:text-gray-400"
+                    autoFocus
+                  />
+                  <button
+                    onClick={addPocketTag}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-black/5 rounded-full transition-colors"
+                    title="追加"
+                  >
+                    <PlusCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div
@@ -141,26 +182,6 @@ export function NightDiaryPage() {
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
-        </div>
-
-        <div className="bg-white/60 backdrop-blur-sm rounded-full shadow-md border border-gray-200/60 px-5 py-2 flex items-center gap-3">
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={quickInput}
-              onChange={(e) => setQuickInput(e.target.value)}
-              onKeyDown={handleQuickSubmit}
-              placeholder="浮かんだ言葉をポケットへ..."
-              className="w-full bg-transparent text-sm text-gray-800 focus:outline-none py-1 pr-8 placeholder:text-gray-400"
-            />
-            <button
-              onClick={addPocketTag}
-              className="absolute right-0 top-1/2 -translate-y-1/2 p-1 hover:bg-black/5 rounded-full transition-colors"
-              title="追加"
-            >
-              <PlusCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-            </button>
-          </div>
         </div>
       </div>
     </div>
