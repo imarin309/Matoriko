@@ -63,12 +63,12 @@ async function downloadCard(params: {
   ctx.fillRect(0, 0, width, height);
 
   // 装飾内枠
-  const frameInset = 10;
+  const frameInset = 35;
   ctx.save();
-  ctx.setLineDash([5, 5]);
+  ctx.setLineDash([15, 15]);
   ctx.strokeStyle = grad.frame;
-  ctx.lineWidth   = 3;
-  roundedRect(ctx, frameInset, frameInset, width - frameInset * 2, height - frameInset * 2, radius - 6);
+  ctx.lineWidth   = 6;
+  roundedRect(ctx, frameInset, frameInset, width - frameInset * 2, height - frameInset * 2, 16);
   ctx.stroke();
   ctx.restore();
 
@@ -79,7 +79,7 @@ async function downloadCard(params: {
     ctx.textBaseline = 'top';
     ctx.fillStyle    = '#7a6070';
     ctx.font         = `400 24px ${params.fontFamily}`;
-    ctx.fillText(todayString(), 60, 60);
+    ctx.fillText(todayString(), 100, 80);
     ctx.restore();
   }
 
@@ -240,9 +240,9 @@ export function MessageCardPage() {
           <div
             className="absolute pointer-events-none"
             style={{
-              inset:        '10px',
-              border:       `2px dashed ${currentGrad.frame}`,
-              borderRadius: '20px',
+              inset:        '18px',
+              border:       `3px dashed ${currentGrad.frame}`,
+              borderRadius: '10px',
             }}
           />
 
@@ -252,8 +252,8 @@ export function MessageCardPage() {
               onClick={(e) => { e.stopPropagation(); setShowDate(false); }}
               className="absolute z-10 cursor-pointer hover:opacity-60 transition-opacity"
               style={{
-                top: '6%',
-                left: '6%',
+                top: '11%',
+                left: '8%',
                 fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
                 color: '#7a6070',
                 background: 'none',
@@ -270,8 +270,8 @@ export function MessageCardPage() {
               onClick={(e) => { e.stopPropagation(); setShowDate(true); }}
               className="absolute z-10 cursor-pointer hover:opacity-80 transition-opacity border border-dashed border-[#b8a0b0] rounded px-1.5 py-0.5 text-[10px] text-[#b8a0b0]"
               style={{
-                top: '6%',
-                left: '6%',
+                top: '11%',
+                left: '8%',
                 background: 'rgba(255,255,255,0.4)',
                 fontFamily,
               }}
