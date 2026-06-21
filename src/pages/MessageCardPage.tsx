@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Calendar } from 'lucide-react';
 import { motion } from 'motion/react';
 import { AppHeader } from '../components/header';
 import { loadImage, roundedRect, wrapText, saveImage } from '../utils/downloadImage';
+import { todayString } from '../utils/date';
 
 type FontStyle = 'apology' | 'pop';
 
@@ -31,6 +32,7 @@ async function downloadCard(params: {
   fontFamily: string;
   gradientIndex: number;
   stampSrc: string;
+  showDate: boolean;
 }) {
   const width  = 1280;
   const height = 720;
@@ -69,6 +71,17 @@ async function downloadCard(params: {
   roundedRect(ctx, frameInset, frameInset, width - frameInset * 2, height - frameInset * 2, radius - 6);
   ctx.stroke();
   ctx.restore();
+
+  // 日付
+  if (params.showDate) {
+    ctx.save();
+    ctx.textAlign    = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillStyle    = '#7a6070';
+    ctx.font         = `400 24px ${params.fontFamily}`;
+    ctx.fillText(todayString(), 60, 60);
+    ctx.restore();
+  }
 
   // スタンプ画像
   try {
@@ -114,9 +127,11 @@ export function MessageCardPage() {
   const [gradientIndex, setGradientIndex] = useState(1);
   const [stampIndex,    setStampIndex]    = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [showDate,       setShowDate]      = useState(true);
 
   const fontFamily   = FONT_FAMILY[font];
   const currentGrad  = GRADIENTS[gradientIndex];
+  const dateStr      = todayString();
 
   const handleDownload = async () => {
     if (isDownloading) return;
@@ -126,6 +141,7 @@ export function MessageCardPage() {
         title, message, fontFamily,
         gradientIndex,
         stampSrc: STAMPS[stampIndex],
+        showDate,
       });
     } catch (e) {
       console.error('download failed:', e);
@@ -145,6 +161,15 @@ export function MessageCardPage() {
         <AppHeader title="message" isSubPage />
         <div className="sub-toolbar">
           <div className="sub-toolbar-container flex-wrap gap-2">
+
+            {/* 日付切り替え */}
+            <button
+              onClick={() => setShowDate(!showDate)}
+              className={`px-3 py-1 text-xs rounded-full border transition-all flex items-center gap-1 ${showDate ? 'bg-pink-100 text-pink-700 border-pink-300' : 'bg-white text-gray-500 border-gray-200 hover:border-pink-200'}`}
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>日付</span>
+            </button>
 
             {/* フォント切り替え */}
             <div className="flex gap-1">
@@ -220,6 +245,41 @@ export function MessageCardPage() {
               borderRadius: '20px',
             }}
           />
+
+          {/* 日付表示 */}
+          {showDate ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDate(false); }}
+              className="absolute z-10 cursor-pointer hover:opacity-60 transition-opacity"
+              style={{
+                top: '6%',
+                left: '6%',
+                fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
+                color: '#7a6070',
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                fontFamily,
+              }}
+              title="クリックして非表示"
+            >
+              {dateStr}
+            </button>
+          ) : (
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowDate(true); }}
+              className="absolute z-10 cursor-pointer hover:opacity-80 transition-opacity border border-dashed border-[#b8a0b0] rounded px-1.5 py-0.5 text-[10px] text-[#b8a0b0]"
+              style={{
+                top: '6%',
+                left: '6%',
+                background: 'rgba(255,255,255,0.4)',
+                fontFamily,
+              }}
+              title="クリックして日付を表示"
+            >
+              + 日付
+            </button>
+          )}
 
           <div className="absolute inset-0 flex flex-col items-center p-[7%]">
             <button
