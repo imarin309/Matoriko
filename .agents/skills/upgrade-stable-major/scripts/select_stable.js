@@ -26,10 +26,19 @@ try {
 
 const candidates = [];
 
-for (const [name, info] of Object.entries(data)) {
-  const current = info.current;
-  const latest = info.latest;
-  if (!current || !latest) continue;
+let outdatedList = [];
+if (Array.isArray(data)) {
+  outdatedList = data;
+} else if (data && typeof data === 'object') {
+  outdatedList = Object.entries(data).map(([name, info]) => ({
+    name,
+    ...info
+  }));
+}
+
+for (const item of outdatedList) {
+  const { name, current, latest, dependencyType } = item;
+  if (!name || !current || !latest) continue;
 
   const currentMajor = current.split('.')[0];
   const latestMajor = latest.split('.')[0];
@@ -42,7 +51,7 @@ for (const [name, info] of Object.entries(data)) {
     if (name.startsWith('@types/')) {
       score = 100;
       category = 'A: 型定義パッケージ（本番挙動への影響なし、最も安全）';
-    } else if (info.dependencyType === 'devDependencies') {
+    } else if (dependencyType === 'devDependencies') {
       score = 50;
       category = 'B: 開発用パッケージ（開発環境・ビルドツールへの影響のみ）';
     } else {
