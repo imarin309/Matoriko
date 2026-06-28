@@ -103,8 +103,14 @@ async function downloadCard(params: {
   ctx.textBaseline = 'top';
   ctx.fillStyle    = '#6b5060';
   ctx.font         = `400 ${titleSize}px ${params.fontFamily}`;
+  if ('letterSpacing' in ctx) {
+    (ctx as unknown as { letterSpacing: string }).letterSpacing = '0.1em';
+  }
   if (params.title) {
     ctx.fillText(params.title, cx, afterImageY, textMaxW);
+  }
+  if ('letterSpacing' in ctx) {
+    (ctx as unknown as { letterSpacing: string }).letterSpacing = 'normal';
   }
 
   // メッセージ
@@ -112,8 +118,15 @@ async function downloadCard(params: {
   ctx.fillStyle = '#7a6070';
   if (params.message) {
     const lineH = msgSize * 2.0;
-    const msgY  = afterImageY + titleSize + 10;
     const lines = wrapText(ctx, params.message, textMaxW);
+
+    // メッセージ描画領域の高さ (217px) と上端Y座標 (454px)
+    // 画面上の height: 16.9531cqw と top: 35.46875cqw に対応
+    const areaH = 217;
+    const areaTop = 454;
+    const totalTextH = lines.length * lineH;
+    const msgY = areaTop + Math.max(0, (areaH - totalTextH) / 2);
+
     lines.forEach((line, i) => ctx.fillText(line, cx, msgY + i * lineH, textMaxW));
   }
 
@@ -225,89 +238,138 @@ export function MessageCardPage() {
           paddingRight: '1rem',
         }}
       >
+        {/* コンテナクエリ用のラッパー */}
         <div
-          className="w-full relative overflow-hidden"
+          className="w-full"
           style={{
-            maxWidth:     '640px',
-            aspectRatio:  '16 / 9',
-            background:   currentGrad.style,
-            fontFamily,
-            borderRadius: '28px',
-            boxShadow:    '0 8px 40px rgba(200,150,180,0.18), 0 2px 8px rgba(180,130,160,0.10)',
+            maxWidth:      '640px',
+            containerType: 'inline-size',
           }}
         >
-          {/* 装飾内枠 */}
           <div
-            className="absolute pointer-events-none"
+            className="w-full relative overflow-hidden"
             style={{
-              inset:        '18px',
-              border:       `3px dashed ${currentGrad.frame}`,
-              borderRadius: '10px',
+              aspectRatio:  '16 / 9',
+              background:   currentGrad.style,
+              fontFamily,
+              borderRadius: '2.1875cqw',
+              boxShadow:    '0 8px 40px rgba(200,150,180,0.18), 0 2px 8px rgba(180,130,160,0.10)',
             }}
-          />
-
-          {/* 日付表示 */}
-          {showDate ? (
-            <button
-              onClick={(e) => { e.stopPropagation(); setShowDate(false); }}
-              className="absolute z-10 cursor-pointer hover:opacity-60 transition-opacity"
+          >
+            {/* 装飾内枠 */}
+            <div
+              className="absolute pointer-events-none"
               style={{
-                top: '11%',
-                left: '8%',
-                fontSize: 'clamp(0.7rem, 2vw, 0.9rem)',
-                color: '#7a6070',
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                fontFamily,
+                inset:        '2.734375cqw',
+                border:       `0.46875cqw dashed ${currentGrad.frame}`,
+                borderRadius: '1.25cqw',
               }}
-              title="クリックして非表示"
-            >
-              {dateStr}
-            </button>
-          ) : (
-            <button
-              onClick={(e) => { e.stopPropagation(); setShowDate(true); }}
-              className="absolute z-10 cursor-pointer hover:opacity-80 transition-opacity border border-dashed border-[#b8a0b0] rounded px-1.5 py-0.5 text-[10px] text-[#b8a0b0]"
-              style={{
-                top: '11%',
-                left: '8%',
-                background: 'rgba(255,255,255,0.4)',
-                fontFamily,
-              }}
-              title="クリックして日付を表示"
-            >
-              + 日付
-            </button>
-          )}
+            />
 
-          <div className="absolute inset-0 flex flex-col items-center p-[7%]">
+            {/* 日付表示 */}
+            {showDate ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowDate(false); }}
+                className="absolute z-10 cursor-pointer hover:opacity-60 transition-opacity"
+                style={{
+                  top:        '6.25cqw',
+                  left:       '7.8125cqw',
+                  fontSize:   '1.875cqw',
+                  color:      '#7a6070',
+                  background: 'none',
+                  border:     'none',
+                  padding:    0,
+                  fontFamily,
+                }}
+                title="クリックして非表示"
+              >
+                {dateStr}
+              </button>
+            ) : (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowDate(true); }}
+                className="absolute z-10 cursor-pointer hover:opacity-80 transition-opacity"
+                style={{
+                  top:          '6.25cqw',
+                  left:         '7.8125cqw',
+                  fontSize:     '1.25cqw',
+                  color:        '#b8a0b0',
+                  background:   'rgba(255,255,255,0.4)',
+                  border:       '0.1cqw dashed #b8a0b0',
+                  borderRadius: '0.4cqw',
+                  padding:      '0.2cqw 0.6cqw',
+                  fontFamily,
+                }}
+                title="クリックして日付を表示"
+              >
+                + 日付
+              </button>
+            )}
+
+            {/* スタンプ画像 */}
             <button
               onClick={(e) => { e.stopPropagation(); setStampIndex((stampIndex + 1) % STAMPS.length); }}
-              className="overflow-hidden shrink-0 cursor-pointer"
-              style={{ width: 'clamp(56px, 16%, 130px)', height: 'clamp(56px, 16%, 130px)' }}
+              className="absolute overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+              style={{
+                top:       '7.03125cqw',
+                left:      '50%',
+                transform: 'translateX(-50%)',
+                width:     '23.4375cqw',
+                height:    '23.4375cqw',
+                border:    'none',
+                background: 'none',
+                padding:   0,
+              }}
             >
               <img src={STAMPS[stampIndex]} alt="" className="w-full h-full object-cover" />
             </button>
+
+            {/* タイトル */}
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onClick={(e) => e.stopPropagation()}
               placeholder="タイトル"
-              className="bg-transparent focus:outline-none w-full text-center mt-2 tracking-widest placeholder:text-[#b8a0b0]"
-              style={{ fontFamily, fontSize: 'clamp(1.1rem, 3.2vw, 1.5rem)', color: '#6b5060' }}
+              className="absolute bg-transparent focus:outline-none text-center placeholder:text-[#b8a0b0]"
+              style={{
+                top:           '31.25cqw',
+                left:          '50%',
+                transform:     'translateX(-50%)',
+                width:         '85.9375cqw',
+                fontFamily,
+                fontSize:      '2.96875cqw',
+                color:         '#6b5060',
+                border:        'none',
+                padding:       0,
+                lineHeight:    '1',
+                letterSpacing: '0.1em',
+              }}
             />
-            <div className="flex-1 flex items-center w-full">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                placeholder="メッセージ"
-                className="bg-transparent focus:outline-none resize-none w-full text-center leading-loose placeholder:text-[#b8a0b0]"
-                style={{ fontFamily, fontSize: 'clamp(0.95rem, 2.5vw, 1.2rem)', color: '#7a6070' }}
-              />
-            </div>
+
+            {/* メッセージ */}
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onClick={(e) => e.stopPropagation()}
+              placeholder="メッセージ"
+              className="absolute bg-transparent focus:outline-none resize-none text-center placeholder:text-[#b8a0b0]"
+              style={{
+                top:        '35.46875cqw', // 36.5625cqw (msgY) - 0.5 * 2.1875cqw (fontSize) to align top of text linebox
+                left:       '50%',
+                transform:  'translateX(-50%)',
+                width:      '85.9375cqw',
+                height:     '16.9531cqw',
+                fontFamily,
+                fontSize:   '2.1875cqw',
+                lineHeight: '2.0',
+                color:      '#7a6070',
+                border:     'none',
+                padding:    0,
+                wordBreak:  'break-all',
+                alignContent: 'center', // 縦中央に配置
+              }}
+            />
           </div>
         </div>
       </div>
