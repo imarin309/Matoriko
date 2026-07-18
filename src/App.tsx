@@ -39,6 +39,12 @@ const tools = [
     label: 'message',
     description: 'メッセージカード',
   },
+  {
+    to: '/pomodoro',
+    icon: <img src="/assets/anpan/funny.png" alt="25timer" className="w-10 h-10 rounded-full object-cover" />,
+    label: '25timer',
+    description: 'ポモドーロタイマー',
+  },
 ];
 
 export default function App() {
