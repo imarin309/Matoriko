@@ -7,6 +7,7 @@ import { NightDiaryPage } from "./pages/NightDiaryPage.tsx";
 import { MemoryPage } from "./pages/MemoryPage.tsx";
 import { TravelItineraryPage } from "./pages/TravelItineraryPage.tsx";
 import { MessageCardPage } from "./pages/MessageCardPage.tsx";
+import { PomodoroPage } from "./pages/PomodoroPage.tsx";
 import "./styles/index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -19,6 +20,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/memory" element={<MemoryPage />} />
       <Route path="/travel" element={<TravelItineraryPage />} />
       <Route path="/message" element={<MessageCardPage />} />
+      <Route path="/pomodoro" element={<PomodoroPage />} />
     </Routes>
   </BrowserRouter>
 );
