@@ -59,6 +59,11 @@ function playChime() {
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.8);
     osc.connect(gain);
     gain.connect(ctx.destination);
+    osc.onended = () => {
+      osc.disconnect();
+      gain.disconnect();
+      ctx.close();
+    };
     osc.start();
     osc.stop(ctx.currentTime + 0.8);
   } catch {
