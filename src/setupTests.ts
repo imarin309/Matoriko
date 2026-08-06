@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom/vitest';
 
-// jsdom は Element.prototype.scrollTo を実装していないため補完する
-Element.prototype.scrollTo = () => {};
+// jsdom が Element.prototype.scrollTo を未実装の場合のみ補完する
+if (typeof Element.prototype.scrollTo !== 'function') {
+  Element.prototype.scrollTo = () => {};
+}
