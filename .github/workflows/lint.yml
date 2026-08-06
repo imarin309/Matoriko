@@ -1,4 +1,4 @@
-name: Lint
+name: CI
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -33,3 +33,9 @@ jobs:
 
       - name: Run TypeScript type check
         run: pnpm exec tsc --noEmit
+
+      - name: Run TypeScript type check (tests)
+        run: pnpm run typecheck:test
+
+      - name: Run smoke tests
+        run: pnpm test
