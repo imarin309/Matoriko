@@ -1,19 +1,19 @@
 import { Download, RotateCcw, Tag } from 'lucide-react';
 import { motion } from 'motion/react';
 
-interface NightDiaryActionsProps {
+interface DiaryActionsProps {
   onDownload: () => void;
   onReset: () => void;
   onToggleTag: () => void;
   isTagActive: boolean;
 }
 
-export function NightDiaryActions({
+export function DiaryActions({
   onDownload,
   onReset,
   onToggleTag,
   isTagActive,
-}: NightDiaryActionsProps) {
+}: DiaryActionsProps) {
   return (
     <div className="sub-toolbar">
       <div className="sub-toolbar-container">

@@ -334,7 +334,7 @@ export function MemoryPage() {
       />
 
       <div className="app-header">
-        <AppHeader title="memory" isSubPage />
+        <AppHeader title="memory" subtitle="写真と言葉でつづる絵日記" isSubPage />
         <div className="sub-toolbar">
           <div className="sub-toolbar-container">
             <motion.button

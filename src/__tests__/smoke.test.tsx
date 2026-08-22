@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import App from '../App';
 import { MindMapPage } from '../pages/MindMapPage';
 import { MindMemoPage } from '../pages/MindMemoPage';
-import { NightDiaryPage } from '../pages/NightDiaryPage';
+import { DiaryPage } from '../pages/DiaryPage';
 import { MemoryPage } from '../pages/MemoryPage';
 import { TravelItineraryPage } from '../pages/TravelItineraryPage';
 import { MessageCardPage } from '../pages/MessageCardPage';
@@ -14,7 +14,7 @@ const routes = [
   { path: '/', label: 'App (トップ)' },
   { path: '/mind-map', label: 'MindMapPage' },
   { path: '/mind-memo', label: 'MindMemoPage' },
-  { path: '/night-diary', label: 'NightDiaryPage' },
+  { path: '/diary', label: 'DiaryPage' },
   { path: '/memory', label: 'MemoryPage' },
   { path: '/travel', label: 'TravelItineraryPage' },
   { path: '/message', label: 'MessageCardPage' },
@@ -28,7 +28,7 @@ function renderAt(path: string) {
         <Route path="/" element={<App />} />
         <Route path="/mind-map" element={<MindMapPage />} />
         <Route path="/mind-memo" element={<MindMemoPage />} />
-        <Route path="/night-diary" element={<NightDiaryPage />} />
+        <Route path="/diary" element={<DiaryPage />} />
         <Route path="/memory" element={<MemoryPage />} />
         <Route path="/travel" element={<TravelItineraryPage />} />
         <Route path="/message" element={<MessageCardPage />} />

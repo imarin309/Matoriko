@@ -34,7 +34,11 @@
   }
 
   .app-title {
-    @apply text-xl md:text-2xl font-bold text-gray-900;
+    @apply text-xl md:text-2xl font-bold text-gray-900 leading-tight;
+  }
+
+  .app-subtitle {
+    @apply text-[11px] md:text-xs text-gray-500 leading-tight truncate;
   }
 
   /* Launcher Components */

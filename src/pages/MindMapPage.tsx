@@ -165,7 +165,7 @@ export function MindMapPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="app-header">
-        <AppHeader title="mind-map" isSubPage />
+        <AppHeader title="mind-map" subtitle="マインドマップ" isSubPage />
         <MindMapActions onSave={saveMindMap} onReset={resetMindMap} />
       </div>
 

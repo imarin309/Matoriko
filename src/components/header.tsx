@@ -3,15 +3,16 @@ import { AppLauncher } from './AppLauncher';
 
 interface AppHeaderProps {
   title: string;
+  subtitle?: string;
   isSubPage?: boolean;
   iconSrc?: string;
 }
 
-export function AppHeader({ title, isSubPage = false, iconSrc }: AppHeaderProps) {
+export function AppHeader({ title, subtitle, isSubPage = false, iconSrc }: AppHeaderProps) {
   const icon = iconSrc ?? '/icons/icon.png';
   return (
     <div className="app-header-container">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 min-w-0">
         {isSubPage ? (
           <Link
             to="/"
@@ -23,7 +24,10 @@ export function AppHeader({ title, isSubPage = false, iconSrc }: AppHeaderProps)
         ) : (
           <img src={icon} alt="アイコン" className="w-9 h-9" />
         )}
-        <h1 className="app-title">{title}</h1>
+        <div className="min-w-0">
+          <h1 className="app-title">{title}</h1>
+          {subtitle && <p className="app-subtitle">{subtitle}</p>}
+        </div>
       </div>
       <AppLauncher />
     </div>

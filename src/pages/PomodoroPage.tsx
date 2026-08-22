@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play, Pause } from 'lucide-react';
 import { AppHeader } from '../components/header';
+import { PAGE_META } from '../utils/pageMeta';
+
+const BASE_TITLE = PAGE_META['/pomodoro'].title;
 
 type Phase = 'work' | 'break';
 
@@ -102,12 +105,11 @@ export function PomodoroPage() {
   }, [isRunning]);
 
   useEffect(() => {
+    // 基準となるタイトルは pageMeta に集約し、計測中だけ残り時間を前置きする。
+    // 離脱時のリセットは RouteMeta が遷移先のタイトルを設定するため不要。
     document.title = isRunning
-      ? `${formatTime(secondsLeft)} - ${PHASE_LABEL[phase]}中 | 25timer`
-      : '25timer';
-    return () => {
-      document.title = 'Matoriko';
-    };
+      ? `${formatTime(secondsLeft)} - ${PHASE_LABEL[phase]}中 | ${BASE_TITLE}`
+      : BASE_TITLE;
   }, [isRunning, secondsLeft, phase]);
 
   const total = DURATIONS[phase];
@@ -136,7 +138,7 @@ export function PomodoroPage() {
   return (
     <div className="min-h-screen transition-colors duration-500" style={{ background: bgColor }}>
       <div className="app-header">
-        <AppHeader title="25timer" isSubPage />
+        <AppHeader title="25timer" subtitle="25分集中・5分休憩のポモドーロ" isSubPage />
       </div>
 
       <div className="flex flex-col max-md:landscape:flex-row md:flex-row items-center justify-center min-h-screen px-4 pt-20 gap-10 max-md:landscape:gap-6 md:gap-16">
