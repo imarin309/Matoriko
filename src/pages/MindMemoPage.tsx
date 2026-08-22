@@ -100,7 +100,7 @@ ${form.rethink}
 
   return (
     <div className="mm-shell min-h-screen" style={{ ['--accent' as string]: accent }}>
-      <AuroraBackground accent={accent} />
+      <AuroraBackground />
 
       {/* ヘッダー */}
       <div className="app-header">

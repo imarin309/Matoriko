@@ -234,10 +234,12 @@
 
   .mm-blob-a {
     @apply w-[26rem] h-[26rem] -top-24 -left-24;
+    background: var(--accent);
   }
 
   .mm-blob-b {
     @apply w-[22rem] h-[22rem] top-1/3 -right-24;
+    background: var(--accent);
     opacity: 0.2;
   }
 
