@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, ArrowDown, RotateCcw, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowDown, Download, RotateCcw, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppHeader } from '../components/header';
-import { MindMemoActions } from '../components/mind-memo/MindMemoActions';
 import { AnpanBubble } from '../components/mind-memo/AnpanBubble';
 import { AuroraBackground } from '../components/mind-memo/AuroraBackground';
 import { StepProgress } from '../components/mind-memo/StepProgress';
 import { IntensitySlider } from '../components/mind-memo/IntensitySlider';
 import { Confetti } from '../components/mind-memo/Confetti';
+import { downloadMemoImage } from '../components/mind-memo/downloadMemoImage';
 import {
   STEPS,
   STEP_ACCENTS,
@@ -27,6 +27,7 @@ export function MindMemoPage() {
   const [done, setDone] = useState(false);
   const [direction, setDirection] = useState(1);
   const [confettiSeed, setConfettiSeed] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
@@ -54,40 +55,16 @@ export function MindMemoPage() {
     }
   };
 
-  const handleDownload = () => {
-    const content = `自分のこころを見つめなおすメモ
-
-◼状況
-${form.situation}
-
-◼感情
-${form.emotion}
-
-◼感情の強度
-${form.intensity}
-
-◼自動思考
-${form.thought}
-
-◼根拠
-${form.evidence}
-
-◼反証
-${form.counter}
-
-◼もう一度冷静になって考えてみる
-${form.rethink}
-`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const now = new Date();
-    a.href = url;
-    a.download = `mindMemo_${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownload = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    try {
+      await downloadMemoImage(form);
+    } catch (e) {
+      console.error('download failed:', e);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReset = () => {
@@ -105,7 +82,6 @@ ${form.rethink}
       {/* ヘッダー */}
       <div className="app-header">
         <AppHeader title="mind-memo" isSubPage />
-        <MindMemoActions done={done} onDownload={handleDownload} />
       </div>
 
       {done && <Confetti colors={STEP_ACCENTS} seed={confettiSeed} />}
@@ -212,8 +188,7 @@ ${form.rethink}
               <AnpanBubble>
                 <p className="text-sm text-gray-800 leading-relaxed">
                   お疲れ様でしたぽよ🎉<br />
-                  よく向き合えましたね。<br />
-                  ヘッダーの save から保存できますよ。
+                  よく向き合えましたぽよね。<br />
                 </p>
               </AnpanBubble>
 
@@ -288,6 +263,21 @@ ${form.rethink}
                   </motion.div>
                 ))}
               </div>
+
+              {/* 画像として保存 */}
+              <motion.button
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 + STEPS.length * 0.06, duration: 0.3 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleDownload}
+                disabled={isSaving}
+                className="mm-next w-full justify-center py-3 disabled:opacity-60"
+              >
+                <Download size={16} />
+                {isSaving ? '処理中...' : '画像として保存'}
+              </motion.button>
 
               {/* ボタン */}
               <div className="flex justify-between items-center">
