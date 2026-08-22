@@ -299,7 +299,7 @@ export function TravelItineraryPage() {
       {/* Header */}
       {!isUIHidden && (
         <div className="app-header">
-          <AppHeader title="travel" isSubPage iconSrc="/assets/travel_anpan.png" />
+          <AppHeader title="travel" subtitle="旅のしおり" isSubPage iconSrc="/assets/travel_anpan.png" />
           <div className="sub-toolbar">
             <div className="sub-toolbar-container">
               <motion.button

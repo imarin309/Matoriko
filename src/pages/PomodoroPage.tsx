@@ -136,7 +136,7 @@ export function PomodoroPage() {
   return (
     <div className="min-h-screen transition-colors duration-500" style={{ background: bgColor }}>
       <div className="app-header">
-        <AppHeader title="25timer" isSubPage />
+        <AppHeader title="25timer" subtitle="25分集中・5分休憩のポモドーロ" isSubPage />
       </div>
 
       <div className="flex flex-col max-md:landscape:flex-row md:flex-row items-center justify-center min-h-screen px-4 pt-20 gap-10 max-md:landscape:gap-6 md:gap-16">

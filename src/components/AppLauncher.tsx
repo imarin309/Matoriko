@@ -70,12 +70,12 @@ export function AppLauncher() {
               <span className="launcher-item-label">mind-memo</span>
             </Link>
             <Link
-              to="/night-diary"
+              to="/diary"
               className="launcher-item"
               onClick={() => setShowLauncher(false)}
             >
               <span className="launcher-item-icon">🌙</span>
-              <span className="launcher-item-label">night-diary</span>
+              <span className="launcher-item-label">diary</span>
             </Link>
             <Link
               to="/memory"

@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
 import { AppHeader } from '../components/header';
-import { NightDiaryActions } from '../components/night-diary/NightDiaryActions';
+import { DiaryActions } from '../components/diary/DiaryActions';
 import { todayString } from '../utils/date';
-import { PocketTagList } from '../components/night-diary/PocketTagList';
-import type { PocketTagData } from '../components/night-diary/pocket-tag-types';
+import { PocketTagList } from '../components/diary/PocketTagList';
+import type { PocketTagData } from '../components/diary/pocket-tag-types';
 import { PlusCircle, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,7 +16,7 @@ const COLORS = [
   'bg-indigo-100/40',
 ];
 
-export function NightDiaryPage() {
+export function DiaryPage() {
   const [dateType, setDateType] = useState<'day' | 'month'>('day');
   const [date, setDate] = useState(todayString());
   const [month, setMonth] = useState(() => todayString().substring(0, 7)); // YYYY-MM
@@ -87,8 +87,8 @@ export function NightDiaryPage() {
       <div className="fixed inset-0 -z-10" style={{ backgroundImage: "url('/assets/kamaboko.jpeg')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
       
       <div className="app-header z-[1000]">
-        <AppHeader title="night-diary" isSubPage />
-        <NightDiaryActions
+        <AppHeader title="diary" subtitle="シンプルな日記" isSubPage />
+        <DiaryActions
           onDownload={handleDownload}
           onReset={handleReset}
           onToggleTag={() => setShowTagInput(!showTagInput)}

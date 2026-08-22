@@ -81,7 +81,7 @@ export function MindMemoPage() {
 
       {/* ヘッダー */}
       <div className="app-header">
-        <AppHeader title="mind-memo" isSubPage />
+        <AppHeader title="mind-memo" subtitle="心のひっかかりを言葉にするメモ" isSubPage />
       </div>
 
       {done && <Confetti colors={STEP_ACCENTS} seed={confettiSeed} />}

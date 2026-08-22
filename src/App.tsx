@@ -13,13 +13,13 @@ const tools = [
     to: '/mind-memo',
     icon: <img src="/assets/anpan.png" alt="mind-memo" className="w-10 h-10" />,
     label: 'mind-memo',
-    description: 'コラム法',
+    description: '心のもやもやを書くメモ',
   },
   {
-    to: '/night-diary',
+    to: '/diary',
     icon: <span className="text-4xl leading-none">🌙</span>,
-    label: 'night-diary',
-    description: '夜日記',
+    label: 'diary',
+    description: 'シンプルな日記',
   },
   {
     to: '/memory',
@@ -51,11 +51,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="app-header">
-        <AppHeader title="Matoriko" />
+        <AppHeader title="Matoriko" subtitle="自分の心を書き出すメモアプリ" />
       </div>
 
       <div className="flex flex-col items-center justify-center min-h-screen px-4 pt-20">
-        <p className="text-gray-400 text-base tracking-widest text-center mb-8 font-light">自分の心を書き出すメモアプリ</p>
         <div className="grid grid-cols-2 gap-4 w-full max-w-sm">
           {tools.map((tool) => (
             <motion.div

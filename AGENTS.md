@@ -8,7 +8,7 @@ React、TypeScript、Viteで構築されたWebアプリケーション。React R
 
 - `/` — マインドマップ（階層的なノード編集、Markdownエクスポート）
 - `/mind-memo` — 認知行動療法のコラム法（7ステップの思考整理フォーム、.txtエクスポート）
-- `/night-diary` — 夜日記（日付付きフリーテキスト、.txtエクスポート）
+- `/diary` — 日記（日付付きフリーテキスト、.txtエクスポート）
 
 各ページのヘッダーに`AppLauncher`コンポーネントを配置し、ページ間を遷移できる。
 
@@ -41,7 +41,10 @@ make clean           # ビルド成果物を削除（dist、dist-ssr、.viteキ�
 ## アーキテクチャ
 
 ### ルーティング
-`src/main.tsx`でBrowserRouterを設定。`App.tsx`はマインドマップページそのもの（ページコンポーネントではなくルートコンポーネント）。`MindMemoPage`と`NightDiaryPage`は`src/pages/`に配置。
+`src/main.tsx`でBrowserRouterを設定。`App.tsx`はマインドマップページそのもの（ページコンポーネントではなくルートコンポーネント）。`MindMemoPage`と`DiaryPage`は`src/pages/`に配置。
+
+### メタ情報（title / description）
+SPAのため、ページごとの`title`と`meta description`は`src/components/RouteMeta.tsx`が`useLocation`を見て実行時に書き換える。文言は`src/utils/pageMeta.ts`の`PAGE_META`に集約されており、ページ追加時はここにルートを追加する（未登録のパスは`DEFAULT_META`にフォールバック）。`index.html`には初期表示用（およびog:）のタグを置いている。
 
 ### 状態管理パターン
 マインドマップのツリー構造には**イミュータブルな状態更新**を使用している。`src/domain/mindmap.tsx`の全操作（追加、削除、更新）は既存のノードを変更せず、新しいノードツリーを作成する。
@@ -77,7 +80,7 @@ make clean           # ビルド成果物を削除（dist、dist-ssr、.viteキ�
 各ページ共通のパターン: `Blob` → `URL.createObjectURL` → `<a download>` → クリック → クリーンアップ。
 - マインドマップ: `mindmap_YYYYMMDD_HHMM.md`（`src/domain/fileName.tsx`でファイル名生成）
 - mind-memo: `mindMemo_YYYYMMDD_HHMM.txt`
-- night-diary: `diary-YYYY-MM-DD.txt`
+- diary: `diary-YYYY-MM-DD.txt`
 
 
 ## Antigravity CLI 動作ルール

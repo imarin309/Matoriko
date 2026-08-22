@@ -171,7 +171,7 @@ export function MessageCardPage() {
       />
 
       <div className="app-header">
-        <AppHeader title="message" isSubPage />
+        <AppHeader title="message" subtitle="メッセージカード" isSubPage />
         <div className="sub-toolbar">
           <div className="sub-toolbar-container flex-wrap gap-2">
 
