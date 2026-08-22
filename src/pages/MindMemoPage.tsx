@@ -1,103 +1,43 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowDown, RotateCcw, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppHeader } from '../components/header';
 import { MindMemoActions } from '../components/mind-memo/MindMemoActions';
+import { AnpanBubble } from '../components/mind-memo/AnpanBubble';
+import { AuroraBackground } from '../components/mind-memo/AuroraBackground';
+import { StepProgress } from '../components/mind-memo/StepProgress';
+import { IntensitySlider } from '../components/mind-memo/IntensitySlider';
+import { Confetti } from '../components/mind-memo/Confetti';
+import {
+  STEPS,
+  STEP_ACCENTS,
+  DONE_ACCENT,
+  initialForm,
+  type FormState,
+} from '../components/mind-memo/steps';
 
-interface FormState {
-  situation: string;
-  emotion: string;
-  intensity: number;
-  thought: string;
-  evidence: string;
-  counter: string;
-  rethink: string;
-}
+const INPUT_PLACEHOLDER = 'ここに書いてみましょう';
 
-const initialForm: FormState = {
-  situation: '',
-  emotion: '',
-  intensity: 50,
-  thought: '',
-  evidence: '',
-  counter: '',
-  rethink: '',
-};
-
-type Step = {
-  key: keyof FormState;
-  question: string;
-  hint: string;
-  placeholder: string;
-  type: 'textarea' | 'range';
-};
-
-const STEPS: Step[] = [
-  {
-    key: 'situation',
-    question: 'どんなことがありましたか？\nその時、自分はどうしていましたか？',
-    hint: '状況・行動',
-    placeholder: '例：友人へのメッセージに既読がついているのに返信がない',
-    type: 'textarea',
-  },
-  {
-    key: 'emotion',
-    question: 'そのとき、どんな気持ちになりましたか？',
-    hint: '感情',
-    placeholder: '例：憂鬱、不安、悲しい',
-    type: 'textarea',
-  },
-  {
-    key: 'intensity',
-    question: 'その気持ちはどのくらい強かったですか？\n今まで体験した中で一番強い感情を100として教えてください。',
-    hint: '感情の強度',
-    placeholder: '',
-    type: 'range',
-  },
-  {
-    key: 'thought',
-    question: 'そのとき、頭の中にどんな考えやイメージが浮かびましたか？',
-    hint: '自動思考',
-    placeholder: '例：自分は嫌われているかと思った',
-    type: 'textarea',
-  },
-  {
-    key: 'evidence',
-    question: 'その考えを裏付けるような事実はありますか？',
-    hint: '根拠',
-    placeholder: '例：先日の会話が友人から顰蹙をかったかもしれない',
-    type: 'textarea',
-  },
-  {
-    key: 'counter',
-    question: 'その考えに反するような事実はありますか？',
-    hint: '反証',
-    placeholder: '例：相手も忙しいだけかもしれない',
-    type: 'textarea',
-  },
-  {
-    key: 'rethink',
-    question: '少し落ち着いて、もう一度考えてみましょう。\n別の視点や過去の経験から、どう思いますか？',
-    hint: 'もう一度考えてみる',
-    placeholder: `・ポジティブな時期だったらどう受け止めたか\n・友人が同じ状況ならどう思うか\n・類似の経験はなかったか、その時問題は起きたか`,
-    type: 'textarea',
-  },
-];
+const IS_MAC =
+  typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
 
 export function MindMemoPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>(initialForm);
   const [done, setDone] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [confettiSeed, setConfettiSeed] = useState(0);
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
+  const accent = done ? DONE_ACCENT : current.accent;
 
   const set = (field: keyof FormState, value: string | number) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const goNext = () => {
     if (isLast) {
+      setConfettiSeed(Math.random() * 1000);
       setDone(true);
     } else {
       setDirection(1);
@@ -156,28 +96,24 @@ ${form.rethink}
     setDone(false);
   };
 
+  const showBeforeAfter = Boolean(form.thought || form.rethink);
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mm-shell min-h-screen" style={{ ['--accent' as string]: accent }}>
+      <AuroraBackground accent={accent} />
+
       {/* ヘッダー */}
       <div className="app-header">
         <AppHeader title="mind-memo" isSubPage />
         <MindMemoActions done={done} onDownload={handleDownload} />
       </div>
 
+      {done && <Confetti colors={STEP_ACCENTS} seed={confettiSeed} />}
+
       {/* コンテンツ */}
       <div className="max-w-lg mx-auto px-4 pb-16 flex flex-col gap-6" style={{ paddingTop: 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))' }}>
 
-        {/* プログレスバー */}
-        <div className="flex items-center gap-2">
-          {STEPS.map((s, i) => (
-            <div
-              key={s.key}
-              className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
-                done || i <= step ? 'bg-gray-900' : 'bg-gray-200'
-              }`}
-            />
-          ))}
-        </div>
+        <StepProgress steps={STEPS} step={step} done={done} />
 
         <AnimatePresence mode="wait" custom={direction}>
           {!done ? (
@@ -191,51 +127,50 @@ ${form.rethink}
               className="flex flex-col gap-5"
             >
               {/* あんぱん＋吹き出し */}
-              <div className="flex items-start gap-4">
-                <img
-                  src="/assets/anpan.png"
-                  alt="あんぱん"
-                  className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 shrink-0 mt-1"
-                />
-                <div className="relative bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-200 px-5 py-4 flex-1">
-                  <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
-                    {current.question}
-                  </p>
-                  <span className="mt-2 inline-block text-xs text-gray-400">{current.hint}</span>
-                </div>
-              </div>
+              <AnpanBubble>
+                <span className="mm-pill mb-2">
+                  <span className="mm-pill-dot" />
+                  {current.hint}
+                </span>
+                <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-line">
+                  {current.question}
+                </p>
+              </AnpanBubble>
 
               {/* 入力エリア */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-5 py-5">
+              <div className="mm-input-card">
                 {current.type === 'textarea' ? (
-                  <textarea
-                    key={current.key}
-                    autoFocus
-                    className="w-full text-sm text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none min-h-[120px]"
-                    placeholder={current.placeholder}
-                    value={form[current.key] as string}
-                    onChange={(e) => set(current.key, e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) goNext();
-                    }}
-                  />
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={form.intensity}
-                      onChange={(e) => set('intensity', Number(e.target.value))}
-                      className="w-full accent-gray-900"
+                  <>
+                    {current.example && (
+                      <p className="mm-example mb-3">{current.example}</p>
+                    )}
+                    <textarea
+                      key={current.key}
+                      autoFocus
+                      className="w-full text-sm text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none min-h-[120px] bg-transparent"
+                      placeholder={INPUT_PLACEHOLDER}
+                      value={form[current.key] as string}
+                      onChange={(e) => set(current.key, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) goNext();
+                      }}
                     />
-                    <div className="flex justify-between text-xs text-gray-400">
-                      <span>0（ほとんどない）</span>
-                      <span className="text-2xl font-bold text-gray-900 tabular-nums">{form.intensity}</span>
-                      <span>100（最大）</span>
+                    <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100">
+                      <span className="text-[10px] text-gray-300 tabular-nums">
+                        {(form[current.key] as string).length} 文字
+                      </span>
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-gray-400">
+                        <kbd className="mm-kbd">{IS_MAC ? '⌘' : 'Ctrl'}</kbd>
+                        <kbd className="mm-kbd">↵</kbd>
+                        で{isLast ? '完了' : '次へ'}
+                      </span>
                     </div>
-                  </div>
+                  </>
+                ) : (
+                  <IntensitySlider
+                    value={form.intensity}
+                    onChange={(v) => set('intensity', v)}
+                  />
                 )}
               </div>
 
@@ -246,19 +181,19 @@ ${form.rethink}
                   whileTap={{ scale: 0.95 }}
                   onClick={goBack}
                   disabled={step === 0}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 disabled:opacity-30 disabled:pointer-events-none transition-all"
+                  className="mm-ghost"
                 >
                   <ArrowLeft size={15} />
                   戻る
                 </motion.button>
 
-                <span className="text-xs text-gray-400">{step + 1} / {STEPS.length}</span>
+                <span className="text-xs text-gray-400 tabular-nums">{step + 1} / {STEPS.length}</span>
 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={goNext}
-                  className="btn-reset"
+                  className="mm-next"
                 >
                   {isLast ? '完了' : '次へ'}
                   <ArrowRight size={15} />
@@ -274,32 +209,83 @@ ${form.rethink}
               className="flex flex-col gap-5"
             >
               {/* 完了メッセージ */}
-              <div className="flex items-start gap-4">
-                <img
-                  src="/assets/anpan.png"
-                  alt="あんぱん"
-                  className="w-14 h-14 rounded-full object-cover border-2 border-gray-200 shrink-0 mt-1"
-                />
-                <div className="relative bg-white rounded-2xl rounded-tl-sm shadow-sm border border-gray-200 px-5 py-4 flex-1">
-                  <p className="text-sm text-gray-800 leading-relaxed">
-                    お疲れ様でしたぽよ🎉<br />
-                    よく向き合えましたね。<br />
-                    ヘッダーの save から保存できますよ。
-                  </p>
-                </div>
-              </div>
+              <AnpanBubble>
+                <p className="text-sm text-gray-800 leading-relaxed">
+                  お疲れ様でしたぽよ🎉<br />
+                  よく向き合えましたね。<br />
+                  ヘッダーの save から保存できますよ。
+                </p>
+              </AnpanBubble>
+
+              {/* ビフォーアフター */}
+              {showBeforeAfter && (
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15, duration: 0.35 }}
+                  className="mm-card px-5 py-5"
+                >
+                  <span className="mm-pill">
+                    <Sparkles size={11} />
+                    こころの変化
+                  </span>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                    <div className="rounded-xl px-4 py-3 border border-gray-200 bg-gray-50/80">
+                      <p className="text-[10px] text-gray-400 mb-1">はじめに浮かんだ考え</p>
+                      <p className="text-sm text-gray-500 whitespace-pre-wrap">
+                        {form.thought || '（未入力）'}
+                      </p>
+                    </div>
+                    <ArrowRight size={16} className="hidden sm:block text-gray-300 mx-1 shrink-0" />
+                    <ArrowDown size={16} className="sm:hidden text-gray-300 mx-auto" />
+                    <div className="mm-after-card">
+                      <p className="text-[10px] text-gray-400 mb-1">もう一度考えてみたら</p>
+                      <p className="text-sm text-gray-800 font-medium whitespace-pre-wrap">
+                        {form.rethink || '（未入力）'}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* 回答サマリー */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 divide-y divide-gray-100">
-                {STEPS.map((s) => (
-                  <div key={s.key} className="px-5 py-4">
-                    <p className="text-xs font-semibold text-gray-400 mb-1">{s.hint}</p>
-                    <p className="text-sm text-gray-800 whitespace-pre-wrap">
-                      {s.key === 'intensity'
-                        ? form.intensity
-                        : (form[s.key] as string) || <span className="text-gray-300">（未入力）</span>}
+              <div className="mm-card divide-y divide-gray-100 overflow-hidden">
+                {STEPS.map((s, i) => (
+                  <motion.div
+                    key={s.key}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 + i * 0.06, duration: 0.3 }}
+                    className="px-5 py-4"
+                  >
+                    <p
+                      className="text-xs font-semibold mb-1.5 flex items-center gap-1.5"
+                      style={{ color: s.accent }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.accent }} />
+                      {s.hint}
                     </p>
-                  </div>
+                    {s.key === 'intensity' ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: s.accent }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${form.intensity}%` }}
+                            transition={{ delay: 0.4 + i * 0.06, duration: 0.6, ease: 'easeOut' }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold tabular-nums text-gray-800">
+                          {form.intensity}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap">
+                        {(form[s.key] as string) || <span className="text-gray-300">（未入力）</span>}
+                      </p>
+                    )}
+                  </motion.div>
                 ))}
               </div>
 
@@ -309,7 +295,7 @@ ${form.rethink}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={goBack}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
+                  className="mm-ghost"
                 >
                   <ArrowLeft size={15} />
                   戻る
@@ -319,7 +305,7 @@ ${form.rethink}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all"
+                  className="mm-ghost"
                 >
                   <RotateCcw size={15} />
                   最初から
