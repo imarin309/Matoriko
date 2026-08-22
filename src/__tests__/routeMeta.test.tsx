@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { RouteMeta } from '../components/RouteMeta';
+import { PomodoroPage } from '../pages/PomodoroPage';
 import { PAGE_META } from '../utils/pageMeta';
 
 function metaContent(selector: string) {
@@ -29,5 +30,16 @@ describe('RouteMeta', () => {
     expect(metaContent('meta[name="description"]')).toBe(expected.description);
     expect(metaContent('meta[property="og:title"]')).toBe(expected.title);
     expect(metaContent('meta[property="og:description"]')).toBe(expected.description);
+  });
+
+  it('ページ側のtitle操作とぶつからない（/pomodoro）', () => {
+    render(
+      <MemoryRouter initialEntries={['/pomodoro']}>
+        <RouteMeta />
+        <PomodoroPage />
+      </MemoryRouter>
+    );
+
+    expect(document.title).toBe(PAGE_META['/pomodoro'].title);
   });
 });
