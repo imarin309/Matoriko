@@ -24,18 +24,37 @@ export function roundedRect(
   ctx.closePath();
 }
 
+/** 行頭に置かない文字（句読点・閉じ括弧・長音など） */
+const NO_LINE_START = new Set([...'、。，．,.:;：；?？!！)）]］}｝〉》」』】〕・…‥ー゛゜ヽヾゝゞ']);
+
+/** ぶら下げられる最大の連続文字数 */
+const MAX_HANGING = 2;
+
+/**
+ * canvas 用の折り返し。
+ * 行頭禁則文字は次の行に送らず、幅を超えても前の行にぶら下げる。
+ * ぶら下げでは行数が増えないため、行数を前提にしたレイアウトには影響しない。
+ */
 export function wrapText(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
   const result: string[] = [];
   for (const para of text.split('\n')) {
     if (!para) { result.push(''); continue; }
     let line = '';
+    let hanging = 0;
     for (const ch of para) {
       const test = line + ch;
       if (ctx.measureText(test).width > maxW && line) {
+        if (NO_LINE_START.has(ch) && hanging < MAX_HANGING) {
+          line = test;
+          hanging++;
+          continue;
+        }
         result.push(line);
         line = ch;
+        hanging = 0;
       } else {
         line = test;
+        hanging = 0;
       }
     }
     if (line) result.push(line);
