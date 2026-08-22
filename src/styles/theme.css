@@ -1,5 +1,12 @@
 @reference "tailwindcss";
 
+/* ステップ色。@property 登録により色のトランジションが効く */
+@property --accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0ea5e9;
+}
+
 @layer base {
   * {
     @apply border-gray-200;
@@ -205,6 +212,148 @@
 
   .child-wrapper {
     @apply relative;
+  }
+
+  /* ===== mind-memo ===== */
+  .mm-shell {
+    --accent: #0ea5e9;
+    transition: --accent 500ms ease;
+  }
+
+  /* 背景（オーロラ） */
+  .mm-aurora {
+    @apply fixed inset-0 -z-10 overflow-hidden pointer-events-none;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 45%, #f7f7fb 100%);
+  }
+
+  .mm-blob {
+    @apply absolute rounded-full;
+    filter: blur(80px);
+    opacity: 0.28;
+  }
+
+  .mm-blob-a {
+    @apply w-[26rem] h-[26rem] -top-24 -left-24;
+    background: var(--accent);
+  }
+
+  .mm-blob-b {
+    @apply w-[22rem] h-[22rem] top-1/3 -right-24;
+    background: var(--accent);
+    opacity: 0.2;
+  }
+
+  .mm-blob-c {
+    @apply w-[24rem] h-[24rem] -bottom-32 left-1/4 bg-indigo-300;
+    opacity: 0.18;
+  }
+
+  /* カード（ガラス調） */
+  .mm-card {
+    @apply rounded-2xl border border-white/70 bg-white/70 backdrop-blur-xl;
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.06);
+  }
+
+  .mm-input-card {
+    @apply rounded-2xl border border-white/70 bg-white/70 backdrop-blur-xl px-5 py-5 transition-shadow duration-300;
+    box-shadow: 0 8px 30px rgb(0 0 0 / 0.06);
+  }
+
+  .mm-input-card:focus-within {
+    border-color: color-mix(in srgb, var(--accent) 35%, white);
+    box-shadow:
+      0 8px 30px rgb(0 0 0 / 0.06),
+      0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+
+  /* ステップ色のピルバッジ */
+  .mm-pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold;
+    background: color-mix(in srgb, var(--accent) 14%, white);
+    color: color-mix(in srgb, var(--accent) 78%, black);
+  }
+
+  .mm-pill-dot {
+    @apply w-1.5 h-1.5 rounded-full;
+    background: var(--accent);
+  }
+
+  /* キーヒント */
+  .mm-kbd {
+    @apply inline-flex items-center justify-center min-w-[1.25rem] px-1 py-0.5 rounded-md border border-gray-200 bg-white text-[10px] leading-none text-gray-500;
+    box-shadow: 0 1px 0 rgb(0 0 0 / 0.06);
+    font-family: inherit;
+  }
+
+  /* 次へボタン */
+  .mm-next {
+    @apply flex items-center gap-2 px-5 py-2.5 rounded-xl text-white text-sm font-medium transition-colors;
+    background: var(--accent);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  .mm-next:hover {
+    background: color-mix(in srgb, var(--accent) 88%, black);
+  }
+
+  .mm-ghost {
+    @apply flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-900 hover:bg-white/70 disabled:opacity-30 disabled:pointer-events-none transition-all;
+  }
+
+  /* 強度スライダー */
+  .mm-track {
+    @apply absolute inset-x-0 h-2.5 rounded-full overflow-hidden;
+    background-image: linear-gradient(
+      90deg,
+      #34d399 0%,
+      #a3e635 25%,
+      #fbbf24 50%,
+      #fb923c 75%,
+      #fb7185 100%
+    );
+  }
+
+  .mm-track-mask {
+    @apply absolute inset-y-0 right-0 bg-gray-200;
+  }
+
+  .mm-tick {
+    @apply absolute inset-y-0 w-px bg-white/60 z-10;
+  }
+
+  .mm-thumb {
+    @apply absolute w-5 h-5 -ml-2.5 rounded-full bg-white border-[3px] pointer-events-none;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.18);
+  }
+
+  /* 吹き出し（左向きのしっぽ付き） */
+  .mm-bubble {
+    @apply relative;
+  }
+
+  .mm-bubble::before {
+    content: '';
+    @apply absolute w-0 h-0;
+    top: 1.15rem;
+    left: -0.5rem;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-right: 8px solid rgb(255 255 255 / 0.78);
+  }
+
+  /* 入力欄の上に出す記入例 */
+  .mm-example {
+    @apply rounded-lg px-3 py-2 text-xs leading-relaxed whitespace-pre-line;
+    background: color-mix(in srgb, var(--accent) 8%, white);
+    color: color-mix(in srgb, var(--accent) 50%, #4b5563);
+    border-left: 3px solid color-mix(in srgb, var(--accent) 45%, white);
+  }
+
+  /* 完了画面のビフォーアフター */
+  .mm-after-card {
+    @apply rounded-xl px-4 py-3 border;
+    background: color-mix(in srgb, var(--accent) 10%, white);
+    border-color: color-mix(in srgb, var(--accent) 28%, white);
   }
 
   /* Icon sizes */
