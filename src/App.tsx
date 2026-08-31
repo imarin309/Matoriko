@@ -45,6 +45,12 @@ const tools = [
     label: '25timer',
     description: 'ポモドーロタイマー',
   },
+  {
+    to: '/shelf',
+    icon: <img src="/assets/onsen_anpan.png" alt="shelf" className="w-10 h-10 object-contain" />,
+    label: 'shelf',
+    description: 'しんどさの棚おろし',
+  },
 ];
 
 export default function App() {

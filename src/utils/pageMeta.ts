@@ -48,6 +48,11 @@ export const PAGE_META: Record<string, PageMeta> = {
     description:
       '25分の集中と5分の休憩をくり返すポモドーロタイマー。応援メッセージにはげまされながら、作業のリズムを整えられます。',
   },
+  '/shelf': {
+    title: 'shelf | Matoriko',
+    description:
+      'しんどいことを短い付箋に書いて、「今は置いとく」「もういい」「よくわからない」の3つの箱に放り込むページ。考えずに、仕分けるだけで終われます。',
+  },
 };
 
 export function metaForPath(pathname: string): PageMeta {
