@@ -53,6 +53,11 @@ export const PAGE_META: Record<string, PageMeta> = {
     description:
       'しんどいことを短い付箋に書いて、「今は置いとく」「もういい」「よくわからない」の3つの箱に放り込むページ。考えずに、仕分けるだけで終われます。',
   },
+  '/murmur': {
+    title: 'murmur | Matoriko',
+    description:
+      '思ったことを一言ずつ書いていくページ。返事は返ってきません。書いたものは古いものから静かに薄くなっていくので、まとまった文章を書く体力がないときにどうぞ。',
+  },
 };
 
 export function metaForPath(pathname: string): PageMeta {

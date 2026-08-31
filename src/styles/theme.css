@@ -489,6 +489,81 @@
     min-height: 44px;
   }
 
+  /* ===== murmur（ひとりごと） ===== */
+  .murmur-shell {
+    background: linear-gradient(180deg, #f8f8f6 0%, #f5f5f2 60%, #f3f4f3 100%);
+  }
+
+  /* 入力欄を下に固定して、その上に積もらせる */
+  .murmur-page {
+    @apply relative max-w-md mx-auto flex flex-col;
+    height: 100dvh;
+    padding-top: max(9rem, calc(8rem + env(safe-area-inset-top)));
+    padding-bottom: max(1.5rem, calc(1rem + env(safe-area-inset-bottom)));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  /* 上端は背景に溶かす。「たくさん書いてしまった」が見えないようにするため */
+  .murmur-stream {
+    @apply relative z-10 flex-1 min-h-0 overflow-y-auto;
+    mask-image: linear-gradient(180deg, transparent 0, #000 4.5rem);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 4.5rem);
+  }
+
+  /* 少ないうちは下（入力欄のそば）に寄せておく */
+  .murmur-stream-inner {
+    @apply flex flex-col justify-end gap-4 min-h-full pb-3;
+  }
+
+  /* 吹き出しにしない。ノートに書き足した行として置く */
+  .murmur-line {
+    @apply text-[15px] leading-loose text-gray-700;
+    overflow-wrap: anywhere;
+    animation: murmur-appear 420ms ease-out;
+  }
+
+  @keyframes murmur-appear {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* 文字の下に敷いて、読むのを邪魔しない */
+  .murmur-anpan {
+    @apply absolute w-20 object-contain pointer-events-none select-none;
+    right: -0.75rem;
+    bottom: 4.5rem;
+    opacity: 0.42;
+    z-index: 0;
+  }
+
+  .murmur-compose {
+    @apply relative z-10 flex items-stretch gap-2 pt-2;
+  }
+
+  .murmur-input {
+    @apply flex-1 min-w-0 rounded-2xl px-4 text-[15px] text-gray-800 bg-white/80 border border-gray-200/80 outline-none transition-colors;
+    @apply placeholder:text-gray-400 focus:bg-white focus:border-gray-300;
+    min-height: 48px;
+  }
+
+  .murmur-send {
+    @apply shrink-0 rounded-2xl px-5 text-sm text-gray-600 bg-white/80 border border-gray-200/80 hover:bg-white transition-colors;
+    min-height: 48px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .murmur-line {
+      animation: none;
+    }
+  }
+
   /* Icon sizes */
   .icon-sm {
     @apply w-4 h-4;

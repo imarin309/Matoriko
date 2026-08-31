@@ -10,6 +10,7 @@ import { TravelItineraryPage } from '../pages/TravelItineraryPage';
 import { MessageCardPage } from '../pages/MessageCardPage';
 import { PomodoroPage } from '../pages/PomodoroPage';
 import { ShelfPage } from '../pages/ShelfPage';
+import { MurmurPage } from '../pages/MurmurPage';
 
 const routes = [
   { path: '/', label: 'App (トップ)' },
@@ -21,6 +22,7 @@ const routes = [
   { path: '/message', label: 'MessageCardPage' },
   { path: '/pomodoro', label: 'PomodoroPage' },
   { path: '/shelf', label: 'ShelfPage' },
+  { path: '/murmur', label: 'MurmurPage' },
 ];
 
 function renderAt(path: string) {
@@ -36,6 +38,7 @@ function renderAt(path: string) {
         <Route path="/message" element={<MessageCardPage />} />
         <Route path="/pomodoro" element={<PomodoroPage />} />
         <Route path="/shelf" element={<ShelfPage />} />
+        <Route path="/murmur" element={<MurmurPage />} />
       </Routes>
     </MemoryRouter>
   );

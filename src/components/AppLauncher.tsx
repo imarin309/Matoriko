@@ -117,6 +117,14 @@ export function AppLauncher() {
               <img src="/assets/onsen_anpan.png" alt="" className="w-5 h-5 shrink-0 object-contain" />
               <span className="launcher-item-label">shelf</span>
             </Link>
+            <Link
+              to="/murmur"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/assets/takoyaki_anpan.png" alt="" className="w-5 h-5 shrink-0 object-contain" />
+              <span className="launcher-item-label">murmur</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
