@@ -51,6 +51,12 @@ const tools = [
     label: 'shelf',
     description: 'しんどさの棚おろし',
   },
+  {
+    to: '/murmur',
+    icon: <img src="/assets/takoyaki_anpan.png" alt="murmur" className="w-10 h-10 object-contain" />,
+    label: 'murmur',
+    description: 'ひとりごと',
+  },
 ];
 
 export default function App() {
