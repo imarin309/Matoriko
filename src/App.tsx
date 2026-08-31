@@ -57,6 +57,12 @@ const tools = [
     label: 'murmur',
     description: 'ひとりごと',
   },
+  {
+    to: '/scrap-word',
+    icon: <img src="/assets/montain_anpan.png" alt="scrap" className="w-10 h-10 object-contain" />,
+    label: 'scrap',
+    description: '感情を吐き出して捨てる',
+  },
 ];
 
 export default function App() {

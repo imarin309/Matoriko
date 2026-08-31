@@ -11,6 +11,7 @@ import { MessageCardPage } from "./pages/MessageCardPage.tsx";
 import { PomodoroPage } from "./pages/PomodoroPage.tsx";
 import { ShelfPage } from "./pages/ShelfPage.tsx";
 import { MurmurPage } from "./pages/MurmurPage.tsx";
+import { ScrapPage } from "./pages/ScrapPage.tsx";
 import "./styles/index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -27,6 +28,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/pomodoro" element={<PomodoroPage />} />
       <Route path="/shelf" element={<ShelfPage />} />
       <Route path="/murmur" element={<MurmurPage />} />
+      <Route path="/scrap-word" element={<ScrapPage />} />
     </Routes>
   </BrowserRouter>
 );
