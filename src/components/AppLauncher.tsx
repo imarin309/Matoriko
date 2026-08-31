@@ -109,6 +109,14 @@ export function AppLauncher() {
               <img src="/assets/anpan/funny.png" alt="" className="w-5 h-5 shrink-0 rounded-full object-cover" />
               <span className="launcher-item-label">25timer</span>
             </Link>
+            <Link
+              to="/shelf"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/assets/onsen_anpan.png" alt="" className="w-5 h-5 shrink-0 object-contain" />
+              <span className="launcher-item-label">shelf</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

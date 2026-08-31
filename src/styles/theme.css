@@ -360,6 +360,135 @@
     border-color: color-mix(in srgb, var(--accent) 28%, white);
   }
 
+  /* ===== shelf（しんどさの棚おろし） ===== */
+  .shelf-shell {
+    background: linear-gradient(180deg, #f9f8f5 0%, #f5f5f1 55%, #f2f3f2 100%);
+  }
+
+  .shelf-page {
+    @apply max-w-md mx-auto flex flex-col gap-5;
+    min-height: 100dvh;
+    padding-top: max(9rem, calc(8rem + env(safe-area-inset-top)));
+    padding-bottom: max(2.5rem, calc(2rem + env(safe-area-inset-bottom)));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  /* 導入の一言。アンパンが左に座っているだけで、言葉は足さない */
+  .shelf-intro {
+    @apply flex items-center gap-3;
+  }
+
+  .shelf-intro-icon {
+    @apply w-12 h-12 object-contain shrink-0;
+  }
+
+  .shelf-lead {
+    @apply text-[15px] text-gray-600 leading-loose;
+  }
+
+  /* 付箋を1枚足すだけの入力欄 */
+  .shelf-compose {
+    @apply flex items-stretch gap-2;
+  }
+
+  .shelf-input {
+    @apply flex-1 min-w-0 rounded-2xl px-4 text-[15px] text-gray-800 bg-white/80 border border-gray-200/80 outline-none transition-colors;
+    @apply placeholder:text-gray-400 focus:bg-white focus:border-gray-300;
+    min-height: 48px;
+  }
+
+  .shelf-add {
+    @apply shrink-0 rounded-2xl px-5 text-sm text-gray-600 bg-white/80 border border-gray-200/80 hover:bg-white transition-colors;
+    min-height: 48px;
+  }
+
+  .shelf-hint {
+    @apply text-xs text-gray-400 leading-relaxed;
+  }
+
+  /* 置き場（未仕分けの盆と3つの箱）。枠は輪郭がわかる程度に留める */
+  .shelf-zone {
+    @apply rounded-2xl transition-colors;
+    border: 1px dashed rgb(203 213 225 / 0.75);
+    background: rgb(255 255 255 / 0.3);
+  }
+
+  .shelf-zone-active,
+  .shelf-zone-receiving {
+    border-color: rgb(148 163 184 / 0.85);
+    background: rgb(255 255 255 / 0.7);
+  }
+
+  .shelf-tray {
+    @apply flex flex-col gap-2 p-3;
+    min-height: 5.5rem;
+  }
+
+  .shelf-tray-notes {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .shelf-boxes {
+    @apply grid grid-cols-3 gap-2;
+  }
+
+  .shelf-box {
+    @apply flex flex-col gap-2 p-2.5;
+    min-height: 9rem;
+  }
+
+  .shelf-box-label {
+    @apply text-[11px] text-gray-500 text-center leading-tight;
+  }
+
+  .shelf-box-notes {
+    @apply flex flex-col gap-1.5;
+  }
+
+  /* 付箋。ドラッグで指に追従させるため touch-action は切っている */
+  .shelf-note {
+    @apply rounded-xl px-3 py-2 text-[13px] text-left text-gray-700 leading-snug;
+    background: #fbf6e7;
+    border: 1px solid rgb(120 113 108 / 0.12);
+    box-shadow: 0 1px 2px rgb(120 113 108 / 0.14);
+    overflow-wrap: anywhere;
+    touch-action: none;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  }
+
+  .shelf-note-on {
+    border-color: rgb(120 113 108 / 0.4);
+    box-shadow: 0 0 0 2px rgb(214 211 209 / 0.9);
+  }
+
+  .shelf-note-dragging {
+    @apply relative z-50;
+    box-shadow: 0 8px 20px rgb(120 113 108 / 0.2);
+    transition: none;
+  }
+
+  /* 付箋を選んでいる間だけ出る、タップ用の置き先 */
+  .shelf-drop {
+    @apply w-full rounded-lg px-2 py-1 text-[11px] text-gray-400 hover:text-gray-600 transition-colors;
+  }
+
+  /* 動きを控える設定のときは、戻るときのアニメーションも出さない */
+  @media (prefers-reduced-motion: reduce) {
+    .shelf-note {
+      transition: none;
+    }
+  }
+
+  .shelf-actions {
+    @apply flex justify-center pt-1;
+  }
+
+  .shelf-quiet {
+    @apply flex items-center justify-center px-4 text-sm text-gray-400 hover:text-gray-600 transition-colors;
+    min-height: 44px;
+  }
+
   /* Icon sizes */
   .icon-sm {
     @apply w-4 h-4;

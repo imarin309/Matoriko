@@ -9,6 +9,7 @@ import { MemoryPage } from "./pages/MemoryPage.tsx";
 import { TravelItineraryPage } from "./pages/TravelItineraryPage.tsx";
 import { MessageCardPage } from "./pages/MessageCardPage.tsx";
 import { PomodoroPage } from "./pages/PomodoroPage.tsx";
+import { ShelfPage } from "./pages/ShelfPage.tsx";
 import "./styles/index.css";
 
 createRoot(document.getElementById("root")!).render(
@@ -23,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/travel" element={<TravelItineraryPage />} />
       <Route path="/message" element={<MessageCardPage />} />
       <Route path="/pomodoro" element={<PomodoroPage />} />
+      <Route path="/shelf" element={<ShelfPage />} />
     </Routes>
   </BrowserRouter>
 );
