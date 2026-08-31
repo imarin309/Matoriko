@@ -58,6 +58,11 @@ export const PAGE_META: Record<string, PageMeta> = {
     description:
       '思ったことを一言ずつ書いていくページ。返事は返ってきません。書いたものは古いものから静かに薄くなっていくので、まとまった文章を書く体力がないときにどうぞ。',
   },
+  '/scrap-word': {
+    title: 'scrap | Matoriko',
+    description:
+      '思ったことをそのまま書き出すページ。整理も答えもいりません。書き終えたら紙をくしゃくしゃに丸めて捨てるように、書いたものは消えます。',
+  },
 };
 
 export function metaForPath(pathname: string): PageMeta {

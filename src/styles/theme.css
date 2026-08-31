@@ -564,6 +564,113 @@
     }
   }
 
+  /* ===== scrap（吐き出し箱） ===== */
+  /* 丸めた紙は画面の外へ出ていくので、はみ出しは画面の端で切る */
+  .scrap-shell {
+    @apply overflow-hidden;
+    background: linear-gradient(180deg, #faf9f6 0%, #f6f5f1 60%, #f3f3f1 100%);
+  }
+
+  /* 紙が画面の高さいっぱいに1枚あるだけ。下に「ぽい」を置く */
+  .scrap-page {
+    @apply max-w-md mx-auto flex flex-col gap-3;
+    --scrap-rule: 2rem;
+    height: 100dvh;
+    padding-top: max(6rem, calc(5rem + env(safe-area-inset-top)));
+    padding-bottom: max(1.5rem, calc(1rem + env(safe-area-inset-bottom)));
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+
+  .scrap-sheet {
+    @apply flex flex-1 min-h-0;
+    transform-origin: 50% 50%;
+  }
+
+  /* 角は落としすぎない（丸みが強いとカードに見えて、紙に見えなくなる） */
+  .scrap-paper {
+    @apply flex-1 min-w-0 rounded-lg overflow-hidden;
+    background: #fffdf6;
+    border: 1px solid rgb(120 113 108 / 0.12);
+    box-shadow: 0 1px 2px rgb(120 113 108 / 0.08), 0 8px 20px rgb(120 113 108 / 0.05);
+  }
+
+  /*
+   * 罫線。1本ぶんの高さを line-height と揃えたタイル1枚にして、文字が罫の上に乗るようにしている。
+   * local は、書いてスクロールしたときに罫線を文字と一緒に動かすため（既定だと罫だけ残ってずれる）。
+   * content-box への clip で、紙のふちに余白が残る。
+   */
+  .scrap-input {
+    @apply w-full h-full resize-none border-0 outline-none;
+    @apply text-[15px] text-gray-700;
+    padding: 1.25rem;
+    line-height: var(--scrap-rule);
+    background-color: transparent;
+    background-image: linear-gradient(
+      to bottom,
+      transparent calc(var(--scrap-rule) - 1px),
+      rgb(120 113 108 / 0.14) calc(var(--scrap-rule) - 1px)
+    );
+    background-size: 100% var(--scrap-rule);
+    background-origin: content-box;
+    background-clip: content-box;
+    background-attachment: local;
+  }
+
+  .scrap-actions {
+    @apply flex justify-center pt-1;
+  }
+
+  .scrap-discard {
+    @apply rounded-2xl px-7 text-sm text-gray-500 bg-white/80 border border-gray-200/80 hover:bg-white transition-colors;
+    min-height: 48px;
+  }
+
+  /* 丸めて、画面の外へ放る。時間は CRUMPLE_MS と揃えている */
+  .scrap-crumpling {
+    @apply pointer-events-none;
+    animation: scrap-crumple 900ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  }
+
+  /* 丸まりきる前に字が読めなくなるように、紙より先に消す */
+  .scrap-crumpling .scrap-input {
+    animation: scrap-ink 380ms ease-out forwards;
+  }
+
+  @keyframes scrap-crumple {
+    0% {
+      transform: none;
+    }
+    30% {
+      transform: scale(0.94) rotate(-1.5deg);
+    }
+    55% {
+      transform: scale(0.4) rotate(7deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(46vw, -34vh) scale(0.1) rotate(38deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes scrap-ink {
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* 丸める動きは出さず、静かに消えるだけにする */
+  @media (prefers-reduced-motion: reduce) {
+    .scrap-crumpling {
+      animation: scrap-ink 900ms ease-out forwards;
+    }
+
+    .scrap-crumpling .scrap-input {
+      animation: none;
+    }
+  }
+
   /* Icon sizes */
   .icon-sm {
     @apply w-4 h-4;

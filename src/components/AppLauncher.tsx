@@ -125,6 +125,14 @@ export function AppLauncher() {
               <img src="/assets/takoyaki_anpan.png" alt="" className="w-5 h-5 shrink-0 object-contain" />
               <span className="launcher-item-label">murmur</span>
             </Link>
+            <Link
+              to="/scrap-word"
+              className="launcher-item"
+              onClick={() => setShowLauncher(false)}
+            >
+              <img src="/assets/montain_anpan.png" alt="" className="w-5 h-5 shrink-0 object-contain" />
+              <span className="launcher-item-label">scrap</span>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
