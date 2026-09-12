@@ -11,16 +11,16 @@ export const PocketTagList: React.FC<PocketTagListProps> = ({ tags, onTagClick }
   if (tags.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-wrap gap-2 justify-center p-4 relative z-10">
+    <div className="w-full flex flex-wrap gap-x-4 gap-y-1 border-t border-gray-100 pt-3">
       <AnimatePresence>
         {tags.map((tag) => (
           <motion.button
             key={tag.id}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => onTagClick(tag)}
-            className={`px-4 py-1.5 rounded-full text-sm border border-white/50 shadow-sm backdrop-blur-sm whitespace-nowrap ${tag.color} text-gray-700 hover:scale-105 active:scale-95 transition-transform`}
+            className="text-base text-gray-400 hover:text-gray-700 transition-colors whitespace-nowrap"
           >
             #{tag.text}
           </motion.button>
