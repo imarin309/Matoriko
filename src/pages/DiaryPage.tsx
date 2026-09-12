@@ -1,20 +1,10 @@
 import { useState, useRef } from 'react';
 import { AppHeader } from '../components/header';
-import { DiaryActions } from '../components/diary/DiaryActions';
 import { todayString } from '../utils/date';
 import { PocketTagList } from '../components/diary/PocketTagList';
 import type { PocketTagData } from '../components/diary/pocket-tag-types';
-import { PlusCircle, Calendar } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-
-const COLORS = [
-  'bg-blue-100/40',
-  'bg-pink-100/40',
-  'bg-purple-100/40',
-  'bg-green-100/40',
-  'bg-yellow-100/40',
-  'bg-indigo-100/40',
-];
+import { PlusCircle, Calendar, Download } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export function DiaryPage() {
   const [dateType, setDateType] = useState<'day' | 'month'>('day');
@@ -23,7 +13,6 @@ export function DiaryPage() {
   const [text, setText] = useState('');
   const [quickInput, setQuickInput] = useState('');
   const [pocketTags, setPocketTags] = useState<PocketTagData[]>([]);
-  const [showTagInput, setShowTagInput] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const currentDateValue = dateType === 'day' ? date : month;
@@ -40,22 +29,12 @@ export function DiaryPage() {
     URL.revokeObjectURL(url);
   };
 
-  const handleReset = () => {
-    setDate(todayString());
-    setMonth(todayString().substring(0, 7));
-    setText('');
-    setPocketTags([]);
-  };
-
   const addPocketTag = () => {
     const trimmed = quickInput.trim();
     if (trimmed) {
       const newTag: PocketTagData = {
         id: crypto.randomUUID(),
         text: trimmed,
-        size: Math.min(100, 60 + trimmed.length * 2),
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        memoIds: [],
       };
       setPocketTags((prev) => [...prev, newTag]);
       setQuickInput('');
@@ -66,8 +45,6 @@ export function DiaryPage() {
     if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
       e.preventDefault();
       addPocketTag();
-    } else if (e.key === 'Escape') {
-      setShowTagInput(false);
     }
   };
 
@@ -88,57 +65,17 @@ export function DiaryPage() {
       
       <div className="app-header z-[1000]">
         <AppHeader title="diary" subtitle="シンプルな日記" isSubPage />
-        <DiaryActions
-          onDownload={handleDownload}
-          onReset={handleReset}
-          onToggleTag={() => setShowTagInput(!showTagInput)}
-          isTagActive={showTagInput}
-        />
-        <AnimatePresence>
-          {showTagInput && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-gray-200/60 bg-white/60 backdrop-blur-sm"
-            >
-              <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
-                <div className="flex-1 relative bg-white/70 backdrop-blur-sm rounded-full shadow-sm border border-gray-200/60 px-4 py-1.5">
-                  <input
-                    type="text"
-                    value={quickInput}
-                    onChange={(e) => setQuickInput(e.target.value)}
-                    onKeyDown={handleQuickSubmit}
-                    placeholder="浮かんだ言葉をポケットへ..."
-                    className="w-full bg-transparent text-sm text-gray-800 focus:outline-none placeholder:text-gray-400"
-                    autoFocus
-                  />
-                  <button
-                    onClick={addPocketTag}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-black/5 rounded-full transition-colors"
-                    title="追加"
-                  >
-                    <PlusCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div
-        className="max-w-lg mx-auto flex flex-col gap-4 relative z-10"
+        className="max-w-lg mx-auto min-h-[100dvh] flex flex-col gap-4 relative z-10"
         style={{
-          paddingTop: 'max(8.5rem, calc(7rem + env(safe-area-inset-top)))',
+          paddingTop: 'max(6rem, calc(4.5rem + env(safe-area-inset-top)))',
           paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
         }}
       >
-        <PocketTagList tags={pocketTags} onTagClick={handleTagClick} />
-
         <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/60 px-5 py-3 flex flex-col gap-3">
           <div className="flex items-center gap-4 text-xs font-medium text-gray-500 border-b border-gray-100 pb-2">
             <button 
@@ -169,20 +106,50 @@ export function DiaryPage() {
             </div>
             <Calendar className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors pointer-events-none" />
           </div>
+
+          <div className="relative pr-8 border-t border-gray-100 pt-3">
+            <label htmlFor="diary-tag" className="sr-only">タグ追加</label>
+            <input
+              id="diary-tag"
+              type="text"
+              value={quickInput}
+              onChange={(e) => setQuickInput(e.target.value)}
+              onKeyDown={handleQuickSubmit}
+              placeholder="浮かんだ言葉をポケットへ..."
+              className="w-full bg-transparent text-sm text-gray-800 focus:outline-none placeholder:text-gray-400"
+            />
+            <button
+              onClick={addPocketTag}
+              className="absolute right-0 bottom-0 p-1 hover:bg-black/5 rounded-full transition-colors"
+              title="追加"
+            >
+              <PlusCircle className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/60 px-5 py-5">
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/60 px-5 py-5 flex flex-col gap-3 flex-1 min-h-0">
           <label htmlFor="diary-text" className="sr-only">日記</label>
           <textarea
             id="diary-text"
             ref={textareaRef}
             autoFocus
-            className="w-full text-base text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none bg-transparent"
-            style={{ minHeight: 'calc(100dvh - 340px)' }}
+            className="w-full flex-1 min-h-[8rem] text-base text-gray-800 placeholder:text-gray-300 resize-none focus:outline-none bg-transparent"
             value={text}
             onChange={(e) => setText(e.target.value)}
           />
+
+          <PocketTagList tags={pocketTags} onTagClick={handleTagClick} />
         </div>
+
+        <motion.button
+          whileTap={{ scale: 0.98 }}
+          onClick={handleDownload}
+          className="btn-sub-action w-full justify-center py-2.5 rounded-2xl"
+        >
+          <Download className="icon-sm" />
+          <span>save</span>
+        </motion.button>
       </div>
     </div>
   );
