@@ -1,49 +1,20 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { EyeOff, Plus, X } from 'lucide-react';
+import { Download, Plus, X } from 'lucide-react';
 import { AppHeader } from '../components/header';
 import { todayString } from '../utils/date';
-
-interface ScheduleItem {
-  id: number;
-  time: string;
-  place: string;
-  memo: string;
-}
-
-interface DayPlan {
-  id: number;
-  date: string;
-  items: ScheduleItem[];
-}
-
-interface PackingItem {
-  id: number;
-  text: string;
-}
-
-const DAY_COLORS = [
-  { bg: '#fff0f5', border: '#f9c0d0', badge: '#f472a8', text: '#9d174d' },
-  { bg: '#fff7ed', border: '#fed7aa', badge: '#fb923c', text: '#9a3412' },
-  { bg: '#f0fdf4', border: '#bbf7d0', badge: '#4ade80', text: '#14532d' },
-  { bg: '#eff6ff', border: '#bfdbfe', badge: '#60a5fa', text: '#1e3a8a' },
-  { bg: '#fdf4ff', border: '#e9d5ff', badge: '#c084fc', text: '#6b21a8' },
-  { bg: '#f0fdfa', border: '#99f6e4', badge: '#2dd4bf', text: '#134e4a' },
-  { bg: '#fefce8', border: '#fde68a', badge: '#facc15', text: '#78350f' },
-];
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return '';
-  const [y, m, d] = dateStr.split('-');
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
-  return `${Number(m)}月${Number(d)}日（${weekdays[date.getDay()]}）`;
-}
+import {
+  DAY_COLORS,
+  formatDate,
+  type DayPlan,
+  type PackingItem,
+  type ScheduleItem,
+} from '../components/travel/itinerary';
+import { downloadTravelImage } from '../components/travel/downloadTravelImage';
 
 function DayPlanCard({
   day,
   dayNumber,
-  isUIHidden,
   onDateChange,
   onItemChange,
   onAddItem,
@@ -52,7 +23,6 @@ function DayPlanCard({
 }: {
   day: DayPlan;
   dayNumber: number;
-  isUIHidden: boolean;
   onDateChange: (id: number, date: string) => void;
   onItemChange: (dayId: number, itemId: number, field: keyof Omit<ScheduleItem, 'id'>, value: string) => void;
   onAddItem: (dayId: number) => void;
@@ -79,30 +49,24 @@ function DayPlanCard({
         >
           {dayNumber}
         </span>
-        {isUIHidden ? (
-          <span className="text-base font-semibold" style={{ color: color.text }}>
-            {formatDate(day.date) || `Day ${dayNumber}`}
-          </span>
-        ) : (
-          <div
-            className="relative cursor-pointer"
-            onClick={() => { try { dateRef.current?.showPicker(); } catch { /* mobile */ } }}
+        <div
+          className="relative cursor-pointer"
+          onClick={() => { try { dateRef.current?.showPicker(); } catch { /* mobile */ } }}
+        >
+          <span
+            className="text-base font-semibold transition-opacity hover:opacity-70"
+            style={{ color: color.text }}
           >
-            <span
-              className="text-base font-semibold transition-opacity hover:opacity-70"
-              style={{ color: color.text }}
-            >
-              {formatDate(day.date) || `Day ${dayNumber} — 日付を選択`}
-            </span>
-            <input
-              ref={dateRef}
-              type="date"
-              value={day.date}
-              onChange={(e) => onDateChange(day.id, e.target.value)}
-              className="absolute inset-0 opacity-0 w-full cursor-pointer"
-            />
-          </div>
-        )}
+            {formatDate(day.date) || `Day ${dayNumber} — 日付を選択`}
+          </span>
+          <input
+            ref={dateRef}
+            type="date"
+            value={day.date}
+            onChange={(e) => onDateChange(day.id, e.target.value)}
+            className="absolute inset-0 opacity-0 w-full cursor-pointer"
+          />
+        </div>
       </div>
 
       {/* Schedule items */}
@@ -111,106 +75,84 @@ function DayPlanCard({
           <div key={item.id} className="relative group/item flex gap-2 items-start">
             <div className="flex-1 flex flex-col gap-1.5">
               <div className="flex gap-2 items-start">
-                {isUIHidden ? (
-                  item.time ? (
-                    <span className="text-xs font-medium text-gray-400 w-12 shrink-0 pt-0.5">{item.time}</span>
-                  ) : null
-                ) : (
-                  <div className="flex items-center gap-0.5 bg-white/70 rounded-xl px-2 py-1.5 border border-transparent focus-within:border-gray-300 shrink-0">
-                    <select
-                      value={item.time ? item.time.split(':')[0] : ''}
-                      onChange={(e) => {
-                        const mm = item.time ? item.time.split(':')[1] : '00';
-                        onItemChange(day.id, item.id, 'time', e.target.value ? `${e.target.value}:${mm}` : '');
-                      }}
-                      className="text-xs text-gray-400 bg-transparent focus:outline-none cursor-pointer"
-                    >
-                      <option value="">--</option>
-                      {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')).map((h) => (
-                        <option key={h} value={h}>{h}</option>
-                      ))}
-                    </select>
-                    <span className="text-xs text-gray-300">:</span>
-                    <select
-                      value={item.time ? item.time.split(':')[1] : ''}
-                      onChange={(e) => {
-                        const hh = item.time ? item.time.split(':')[0] : '00';
-                        onItemChange(day.id, item.id, 'time', `${hh}:${e.target.value}`);
-                      }}
-                      className="text-xs text-gray-400 bg-transparent focus:outline-none cursor-pointer"
-                    >
-                      {['00','10','20','30','40','50'].map((m) => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                {isUIHidden ? (
-                  <span className="text-sm font-semibold text-gray-800 leading-snug">{item.place}</span>
-                ) : (
-                  <input
-                    type="text"
-                    value={item.place}
-                    onChange={(e) => onItemChange(day.id, item.id, 'place', e.target.value)}
-                    className="flex-1 text-sm font-semibold text-gray-800 bg-white/70 rounded-xl px-2 py-1.5 focus:outline-none border border-transparent focus:border-gray-300 placeholder:text-gray-300"
-                    placeholder="場所・タイトル"
-                  />
-                )}
+                <div className="flex items-center gap-0.5 bg-white/70 rounded-xl px-2 py-1.5 border border-transparent focus-within:border-gray-300 shrink-0">
+                  <select
+                    value={item.time ? item.time.split(':')[0] : ''}
+                    onChange={(e) => {
+                      const mm = item.time ? item.time.split(':')[1] : '00';
+                      onItemChange(day.id, item.id, 'time', e.target.value ? `${e.target.value}:${mm}` : '');
+                    }}
+                    className="text-xs text-gray-400 bg-transparent focus:outline-none cursor-pointer"
+                  >
+                    <option value="">--</option>
+                    {Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0')).map((h) => (
+                      <option key={h} value={h}>{h}</option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-gray-300">:</span>
+                  <select
+                    value={item.time ? item.time.split(':')[1] : ''}
+                    onChange={(e) => {
+                      const hh = item.time ? item.time.split(':')[0] : '00';
+                      onItemChange(day.id, item.id, 'time', `${hh}:${e.target.value}`);
+                    }}
+                    className="text-xs text-gray-400 bg-transparent focus:outline-none cursor-pointer"
+                  >
+                    {['00','10','20','30','40','50'].map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  value={item.place}
+                  onChange={(e) => onItemChange(day.id, item.id, 'place', e.target.value)}
+                  className="flex-1 text-sm font-semibold text-gray-800 bg-white/70 rounded-xl px-2 py-1.5 focus:outline-none border border-transparent focus:border-gray-300 placeholder:text-gray-300"
+                  placeholder="場所・タイトル"
+                />
               </div>
-              {(item.memo || !isUIHidden) && (
-                isUIHidden ? (
-                  <p className="text-xs text-gray-500 leading-relaxed">{item.memo}</p>
-                ) : (
-                  <textarea
-                    value={item.memo}
-                    onChange={(e) => onItemChange(day.id, item.id, 'memo', e.target.value)}
-                    className="w-full text-xs text-gray-500 bg-white/70 rounded-xl px-2 py-1.5 resize-none focus:outline-none border border-transparent focus:border-gray-300 placeholder:text-gray-300 leading-relaxed"
-                    rows={2}
-                    placeholder="メモ"
-                  />
-                )
-              )}
+              <textarea
+                value={item.memo}
+                onChange={(e) => onItemChange(day.id, item.id, 'memo', e.target.value)}
+                className="w-full text-xs text-gray-500 bg-white/70 rounded-xl px-2 py-1.5 resize-none focus:outline-none border border-transparent focus:border-gray-300 placeholder:text-gray-300 leading-relaxed"
+                rows={2}
+                placeholder="メモ"
+              />
             </div>
-            {!isUIHidden && (
-              <button
-                onClick={() => onDeleteItem(day.id, item.id)}
-                className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0 mt-1.5 hover:bg-rose-400 hover:text-white"
-                aria-label="削除"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
+            <button
+              onClick={() => onDeleteItem(day.id, item.id)}
+              className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0 mt-1.5 hover:bg-rose-400 hover:text-white"
+              aria-label="削除"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </div>
         ))}
 
-        {!isUIHidden && (
-          <button
-            onClick={() => onAddItem(day.id)}
-            className="flex items-center gap-1.5 text-xs font-medium mt-1 transition-colors"
-            style={{ color: color.badge }}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            項目を追加
-          </button>
-        )}
+        <button
+          onClick={() => onAddItem(day.id)}
+          className="flex items-center gap-1.5 text-xs font-medium mt-1 transition-colors"
+          style={{ color: color.badge }}
+        >
+          <Plus className="w-3.5 h-3.5" />
+          項目を追加
+        </button>
       </div>
 
       {/* Delete day */}
-      {!isUIHidden && (
-        <button
-          onClick={() => onDeleteDay(day.id)}
-          className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-400 text-white shadow-sm opacity-0 group-hover/day:opacity-100 transition-opacity flex items-center justify-center hover:bg-rose-500 z-10"
-          aria-label="日程を削除"
-        >
-          <X className="w-3 h-3" />
-        </button>
-      )}
+      <button
+        onClick={() => onDeleteDay(day.id)}
+        className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-rose-400 text-white shadow-sm opacity-0 group-hover/day:opacity-100 transition-opacity flex items-center justify-center hover:bg-rose-500 z-10"
+        aria-label="日程を削除"
+      >
+        <X className="w-3 h-3" />
+      </button>
     </motion.div>
   );
 }
 
 export function TravelItineraryPage() {
-  const [isUIHidden, setIsUIHidden] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState(todayString());
   const [endDate, setEndDate] = useState(todayString());
@@ -283,11 +225,20 @@ export function TravelItineraryPage() {
   const updatePackingText = (id: number, text: string) =>
     setPacking((prev) => prev.map((p) => (p.id === id ? { ...p, text } : p)));
 
+  const handleDownload = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      await downloadTravelImage({ title, startDate, endDate, days, packing, memo });
+    } catch (e) {
+      console.error('download failed:', e);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   return (
-    <div
-      className="min-h-screen relative"
-      onClick={isUIHidden ? () => setIsUIHidden(false) : undefined}
-    >
+    <div className="min-h-screen relative">
       {/* Background */}
       <div
         className="fixed inset-0 -z-10"
@@ -297,32 +248,29 @@ export function TravelItineraryPage() {
       />
 
       {/* Header */}
-      {!isUIHidden && (
-        <div className="app-header">
-          <AppHeader title="travel" subtitle="旅のしおり" isSubPage iconSrc="/assets/travel_anpan.png" />
-          <div className="sub-toolbar">
-            <div className="sub-toolbar-container">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={(e) => { e.stopPropagation(); setIsUIHidden(true); }}
-                aria-label="UIを非表示"
-                className="btn-sub-action-ghost"
-              >
-                <EyeOff className="icon-sm" />
-              </motion.button>
-            </div>
+      <div className="app-header">
+        <AppHeader title="travel" subtitle="旅のしおり" isSubPage iconSrc="/assets/travel_anpan.png" />
+        <div className="sub-toolbar">
+          <div className="sub-toolbar-container">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => void handleDownload()}
+              disabled={isDownloading}
+              className="btn-sub-action"
+            >
+              <Download className="icon-sm" />
+              <span className="text-xs">{isDownloading ? '処理中...' : '保存'}</span>
+            </motion.button>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Content */}
       <div
         className="max-w-lg mx-auto flex flex-col gap-5"
         style={{
-          paddingTop: isUIHidden
-            ? 'max(2rem, env(safe-area-inset-top))'
-            : 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
+          paddingTop: 'max(10rem, calc(7.5rem + env(safe-area-inset-top)))',
           paddingBottom: 'max(4rem, env(safe-area-inset-bottom))',
           paddingLeft: 'max(1rem, env(safe-area-inset-left))',
           paddingRight: 'max(1rem, env(safe-area-inset-right))',
@@ -336,60 +284,46 @@ export function TravelItineraryPage() {
             border: '1.5px solid #f9c0d0',
           }}
         >
-          {isUIHidden ? (
-            <h2 className="text-2xl font-bold text-gray-800 mb-3 leading-snug">
-              {title || '旅のしおり'}
-            </h2>
-          ) : (
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="旅行タイトル"
-              className="w-full text-2xl font-bold text-gray-800 placeholder:text-gray-300 bg-transparent focus:outline-none mb-3"
-            />
-          )}
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="旅行タイトル"
+            className="w-full text-2xl font-bold text-gray-800 placeholder:text-gray-300 bg-transparent focus:outline-none mb-3"
+          />
 
           <div className="flex items-center gap-2 text-sm">
-            {isUIHidden ? (
-              <span className="text-gray-600 font-medium">
-                {formatDate(startDate)} 〜 {formatDate(endDate)}
+            <div
+              className="relative cursor-pointer"
+              onClick={() => { try { startDateRef.current?.showPicker(); } catch { /* */ } }}
+            >
+              <span className="text-gray-600 font-medium hover:text-pink-500 transition-colors">
+                {formatDate(startDate) || '出発日'}
               </span>
-            ) : (
-              <>
-                <div
-                  className="relative cursor-pointer"
-                  onClick={() => { try { startDateRef.current?.showPicker(); } catch { /* */ } }}
-                >
-                  <span className="text-gray-600 font-medium hover:text-pink-500 transition-colors">
-                    {formatDate(startDate) || '出発日'}
-                  </span>
-                  <input
-                    ref={startDateRef}
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="absolute inset-0 opacity-0 w-full cursor-pointer"
-                  />
-                </div>
-                <span className="text-gray-400">〜</span>
-                <div
-                  className="relative cursor-pointer"
-                  onClick={() => { try { endDateRef.current?.showPicker(); } catch { /* */ } }}
-                >
-                  <span className="text-gray-600 font-medium hover:text-pink-500 transition-colors">
-                    {formatDate(endDate) || '帰着日'}
-                  </span>
-                  <input
-                    ref={endDateRef}
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="absolute inset-0 opacity-0 w-full cursor-pointer"
-                  />
-                </div>
-              </>
-            )}
+              <input
+                ref={startDateRef}
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="absolute inset-0 opacity-0 w-full cursor-pointer"
+              />
+            </div>
+            <span className="text-gray-400">〜</span>
+            <div
+              className="relative cursor-pointer"
+              onClick={() => { try { endDateRef.current?.showPicker(); } catch { /* */ } }}
+            >
+              <span className="text-gray-600 font-medium hover:text-pink-500 transition-colors">
+                {formatDate(endDate) || '帰着日'}
+              </span>
+              <input
+                ref={endDateRef}
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="absolute inset-0 opacity-0 w-full cursor-pointer"
+              />
+            </div>
           </div>
         </div>
 
@@ -416,7 +350,6 @@ export function TravelItineraryPage() {
                 key={day.id}
                 day={day}
                 dayNumber={index + 1}
-                isUIHidden={isUIHidden}
                 onDateChange={updateDayDate}
                 onItemChange={updateScheduleItem}
                 onAddItem={addScheduleItem}
@@ -426,16 +359,14 @@ export function TravelItineraryPage() {
             ))}
           </AnimatePresence>
 
-          {!isUIHidden && (
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={addDay}
-              className="relative z-20 w-full py-3 rounded-3xl border-2 border-dashed text-pink-300 hover:text-pink-400 hover:border-pink-300 transition-colors duration-200 text-sm font-medium"
-            >
-              + 日程を追加
-            </motion.button>
-          )}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={addDay}
+            className="relative z-20 w-full py-3 rounded-3xl border-2 border-dashed text-pink-300 hover:text-pink-400 hover:border-pink-300 transition-colors duration-200 text-sm font-medium"
+          >
+            + 日程を追加
+          </motion.button>
         </div>
 
         {/* Sticker 2 */}
@@ -449,7 +380,6 @@ export function TravelItineraryPage() {
         </div>
 
         {/* Packing list section */}
-        {(!isUIHidden || packing.some((p) => p.text)) && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 px-1">
             <img src="/assets/travel_anpan.png" alt="" className="w-7 h-7 shrink-0" />
@@ -470,45 +400,34 @@ export function TravelItineraryPage() {
                     exit={{ opacity: 0, y: -8 }}
                     className="relative group/pack flex items-center gap-2.5"
                   >
-                    {isUIHidden ? (
-                      <span className="text-sm leading-snug text-gray-700">
-                        {item.text}
-                      </span>
-                    ) : (
-                      <input
-                        type="text"
-                        value={item.text}
-                        onChange={(e) => updatePackingText(item.id, e.target.value)}
-                        className="flex-1 text-sm bg-transparent focus:outline-none placeholder:text-gray-300 text-gray-700"
-                        placeholder="アイテムを追加"
-                      />
-                    )}
-                    {!isUIHidden && (
-                      <button
-                        onClick={() => deletePacking(item.id)}
-                        className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center opacity-0 group-hover/pack:opacity-100 transition-opacity hover:bg-rose-400 hover:text-white shrink-0"
-                        aria-label="削除"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    )}
+                    <input
+                      type="text"
+                      value={item.text}
+                      onChange={(e) => updatePackingText(item.id, e.target.value)}
+                      className="flex-1 text-sm bg-transparent focus:outline-none placeholder:text-gray-300 text-gray-700"
+                      placeholder="アイテムを追加"
+                    />
+                    <button
+                      onClick={() => deletePacking(item.id)}
+                      className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center opacity-0 group-hover/pack:opacity-100 transition-opacity hover:bg-rose-400 hover:text-white shrink-0"
+                      aria-label="削除"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
                   </motion.div>
                 ))}
               </AnimatePresence>
 
-              {!isUIHidden && (
-                <button
-                  onClick={addPacking}
-                  className="flex items-center gap-1.5 text-xs font-medium text-purple-400 hover:text-purple-500 transition-colors mt-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  追加
-                </button>
-              )}
+              <button
+                onClick={addPacking}
+                className="flex items-center gap-1.5 text-xs font-medium text-purple-400 hover:text-purple-500 transition-colors mt-1"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                追加
+              </button>
             </div>
           </div>
         </div>
-        )}
 
         {/* Sticker 3 */}
         <div className="relative z-10 flex justify-end pr-2 -mt-14 -mb-14">
@@ -521,7 +440,6 @@ export function TravelItineraryPage() {
         </div>
 
         {/* Free memo section */}
-        {(!isUIHidden || memo) && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2 px-1">
             <img src="/assets/travel_anpan.png" alt="" className="w-7 h-7 shrink-0" />
@@ -532,22 +450,15 @@ export function TravelItineraryPage() {
             className="rounded-3xl px-5 py-4"
             style={{ background: '#fefce8', border: '1.5px solid #fde68a' }}
           >
-            {isUIHidden ? (
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {memo}
-              </p>
-            ) : (
-              <textarea
-                value={memo}
-                onChange={(e) => setMemo(e.target.value)}
-                className="w-full text-sm text-gray-700 bg-transparent placeholder:text-gray-300 resize-none focus:outline-none leading-relaxed"
-                style={{ minHeight: '6rem' }}
-                placeholder="自由にメモ..."
-              />
-            )}
+            <textarea
+              value={memo}
+              onChange={(e) => setMemo(e.target.value)}
+              className="w-full text-sm text-gray-700 bg-transparent placeholder:text-gray-300 resize-none focus:outline-none leading-relaxed"
+              style={{ minHeight: '6rem' }}
+              placeholder="自由にメモ..."
+            />
           </div>
         </div>
-        )}
       </div>
     </div>
   );
