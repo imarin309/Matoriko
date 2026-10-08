@@ -26,30 +26,36 @@ const MAX_DURATION_SECONDS = 90 * 60;
 const adjustButtonClass =
   'flex items-center justify-center w-7 h-7 rounded-full bg-white border border-gray-200 text-gray-500 shadow-sm disabled:opacity-40';
 
-const WORK_MESSAGES_25 = ['ぽよー！！']; 
-const WORK_MESSAGES_20 = ['頑張っててえらいぽよねえ'];     
-const WORK_MESSAGES_15 = ['10分も頑張ったぽよか、、']; 
-const WORK_MESSAGES_10 = ['あと10分だぽよ！！！']; // 残り10分
-const WORK_MESSAGES_5  = ['こんなに頑張っている人見たことない、、'];   // 残り5分
+type Message = string | ((minutesLeft: number) => string);
 
-const WORK_MESSAGE_BRACKETS = [
-  WORK_MESSAGES_25,
-  WORK_MESSAGES_20,
-  WORK_MESSAGES_15,
-  WORK_MESSAGES_10,
-  WORK_MESSAGES_5,
-];
+// 時間を変えられるので、何分目かではなく進み具合（序盤・中盤・終盤）で選ぶ
+const MESSAGE_STAGES: Record<Phase, Message[][]> = {
+  work: [
+    ['ぽよー！！', 'はじめたのえらいぽよ', 'まずは一歩だぽよ', '集中モードぽよ〜'],
+    ['頑張っててえらいぽよねえ', 'いい調子ぽよ', '半分きたぽよ！', '水分とってるぽよ？'],
+    [
+      (minutesLeft) => `あと${minutesLeft}分だぽよ！！！`,
+      'こんなに頑張っている人見たことない、、',
+      'ラストスパートぽよ',
+      'もうすぐ休めるぽよ〜',
+    ],
+  ],
+  break: [
+    ['お疲れ様だぽよねえ', 'のびーってするぽよ', '目を閉じてみるぽよ', 'お茶でも飲むぽよ', 'えらかったぽよ'],
+  ],
+};
 
-const BREAK_MESSAGES_5 = ['お疲れ様だぽよねえ'];
+function randomSeed() {
+  return Math.floor(Math.random() * 1000);
+}
 
-const BREAK_MESSAGE_BRACKETS = [
-  BREAK_MESSAGES_5,
-];
-
-const MESSAGE_INTERVAL_SECONDS = 5 * 60;
-
-function pickMessage(bracket: string[], seed: number) {
-  return bracket[seed % bracket.length];
+// 毎秒の再描画で文言が変わらないよう、乱数はフェーズ開始時に1回だけ引いて段階ごとにずらす
+function pickMessage(phase: Phase, progress: number, seed: number, secondsLeft: number) {
+  const stages = MESSAGE_STAGES[phase];
+  const stageIndex = Math.min(stages.length - 1, Math.floor(progress * stages.length));
+  const candidates = stages[stageIndex];
+  const message = candidates[(seed + stageIndex) % candidates.length];
+  return typeof message === 'function' ? message(Math.ceil(secondsLeft / 60)) : message;
 }
 
 function formatTime(totalSeconds: number) {
@@ -88,6 +94,7 @@ export function PomodoroPage() {
   const [durations, setDurations] = useState(DEFAULT_DURATIONS);
   const [secondsLeft, setSecondsLeft] = useState(DEFAULT_DURATIONS.work);
   const [isRunning, setIsRunning] = useState(false);
+  const [messageSeed, setMessageSeed] = useState(randomSeed);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -98,6 +105,7 @@ export function PomodoroPage() {
         if (prev <= 1) {
           playChime();
           setIsRunning(false);
+          setMessageSeed(randomSeed());
           setPhase((prevPhase) => {
             const nextPhase: Phase = prevPhase === 'work' ? 'break' : 'work';
             setSecondsLeft(durations[nextPhase]);
@@ -130,6 +138,7 @@ export function PomodoroPage() {
   const selectPhase = (next: Phase) => {
     setIsRunning(false);
     setPhase(next);
+    setMessageSeed(randomSeed());
     setSecondsLeft(durations[next]);
   };
 
@@ -152,10 +161,7 @@ export function PomodoroPage() {
   const accent = phase === 'work' ? '#6b8afd' : '#4dbf8a';
   const bgColor = phase === 'work' ? '#fdeceb' : '#eaf3fb';
 
-  const elapsed = total - secondsLeft;
-  const brackets = phase === 'work' ? WORK_MESSAGE_BRACKETS : BREAK_MESSAGE_BRACKETS;
-  const bracketIndex = Math.floor(elapsed / MESSAGE_INTERVAL_SECONDS) % brackets.length;
-  const message = pickMessage(brackets[bracketIndex], bracketIndex);
+  const message = pickMessage(phase, progress, messageSeed, secondsLeft);
 
   return (
     <div className="min-h-screen transition-colors duration-500" style={{ background: bgColor }}>
