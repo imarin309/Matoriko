@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Minus, Plus } from 'lucide-react';
 import { AppHeader } from '../components/header';
 import { PAGE_META } from '../utils/pageMeta';
 
@@ -7,7 +7,7 @@ const BASE_TITLE = PAGE_META['/pomodoro'].title;
 
 type Phase = 'work' | 'break';
 
-const DURATIONS: Record<Phase, number> = {
+const DEFAULT_DURATIONS: Record<Phase, number> = {
   work: 25 * 60,
   break: 5 * 60,
 };
@@ -17,30 +17,45 @@ const PHASE_LABEL: Record<Phase, string> = {
   break: '休憩',
 };
 
-const WORK_MESSAGES_25 = ['ぽよー！！']; 
-const WORK_MESSAGES_20 = ['頑張っててえらいぽよねえ'];     
-const WORK_MESSAGES_15 = ['10分も頑張ったぽよか、、']; 
-const WORK_MESSAGES_10 = ['あと10分だぽよ！！！']; // 残り10分
-const WORK_MESSAGES_5  = ['こんなに頑張っている人見たことない、、'];   // 残り5分
+const PHASES: Phase[] = ['work', 'break'];
 
-const WORK_MESSAGE_BRACKETS = [
-  WORK_MESSAGES_25,
-  WORK_MESSAGES_20,
-  WORK_MESSAGES_15,
-  WORK_MESSAGES_10,
-  WORK_MESSAGES_5,
-];
+const DURATION_STEP_SECONDS = 60;
+const MIN_DURATION_SECONDS = 1 * 60;
+const MAX_DURATION_SECONDS = 90 * 60;
 
-const BREAK_MESSAGES_5 = ['お疲れ様だぽよねえ'];
+const adjustButtonClass =
+  'flex items-center justify-center w-7 h-7 rounded-full bg-white border border-gray-200 text-gray-500 shadow-sm disabled:opacity-40';
 
-const BREAK_MESSAGE_BRACKETS = [
-  BREAK_MESSAGES_5,
-];
+type Message = string | ((minutesLeft: number) => string);
 
-const MESSAGE_INTERVAL_SECONDS = 5 * 60;
+// 時間を変えられるので、何分目かではなく進み具合（序盤・中盤・終盤）で選ぶ
+const MESSAGE_STAGES: Record<Phase, Message[][]> = {
+  work: [
+    ['ぽよー！！', 'はじめたのえらいぽよ', 'まずは一歩だぽよ', '集中モードぽよ〜'],
+    ['頑張っててえらいぽよねえ', 'いい調子ぽよ', '半分きたぽよ！', '水分とってるぽよ？'],
+    [
+      (minutesLeft) => `あと${minutesLeft}分だぽよ！！！`,
+      'こんなに頑張っている人見たことない、、',
+      'ラストスパートぽよ',
+      'もうすぐ休めるぽよ〜',
+    ],
+  ],
+  break: [
+    ['お疲れ様だぽよねえ', 'のびーってするぽよ', '目を閉じてみるぽよ', 'お茶でも飲むぽよ', 'えらかったぽよ'],
+  ],
+};
 
-function pickMessage(bracket: string[], seed: number) {
-  return bracket[seed % bracket.length];
+function randomSeed() {
+  return Math.floor(Math.random() * 1000);
+}
+
+// 毎秒の再描画で文言が変わらないよう、乱数はフェーズ開始時に1回だけ引いて段階ごとにずらす
+function pickMessage(phase: Phase, progress: number, seed: number, secondsLeft: number) {
+  const stages = MESSAGE_STAGES[phase];
+  const stageIndex = Math.min(stages.length - 1, Math.floor(progress * stages.length));
+  const candidates = stages[stageIndex];
+  const message = candidates[(seed + stageIndex) % candidates.length];
+  return typeof message === 'function' ? message(Math.ceil(secondsLeft / 60)) : message;
 }
 
 function formatTime(totalSeconds: number) {
@@ -76,8 +91,10 @@ function playChime() {
 
 export function PomodoroPage() {
   const [phase, setPhase] = useState<Phase>('work');
-  const [secondsLeft, setSecondsLeft] = useState(DURATIONS.work);
+  const [durations, setDurations] = useState(DEFAULT_DURATIONS);
+  const [secondsLeft, setSecondsLeft] = useState(DEFAULT_DURATIONS.work);
   const [isRunning, setIsRunning] = useState(false);
+  const [messageSeed, setMessageSeed] = useState(randomSeed);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -88,9 +105,10 @@ export function PomodoroPage() {
         if (prev <= 1) {
           playChime();
           setIsRunning(false);
+          setMessageSeed(randomSeed());
           setPhase((prevPhase) => {
             const nextPhase: Phase = prevPhase === 'work' ? 'break' : 'work';
-            setSecondsLeft(DURATIONS[nextPhase]);
+            setSecondsLeft(durations[nextPhase]);
             return nextPhase;
           });
           return 0;
@@ -102,7 +120,7 @@ export function PomodoroPage() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning]);
+  }, [isRunning, durations]);
 
   useEffect(() => {
     // 基準となるタイトルは pageMeta に集約し、計測中だけ残り時間を前置きする。
@@ -112,12 +130,25 @@ export function PomodoroPage() {
       : BASE_TITLE;
   }, [isRunning, secondsLeft, phase]);
 
-  const total = DURATIONS[phase];
+  const total = durations[phase];
   const progress = (total - secondsLeft) / total;
 
   const handleToggle = () => setIsRunning((v) => !v);
 
-  const isFresh = secondsLeft === DURATIONS[phase];
+  const selectPhase = (next: Phase) => {
+    setIsRunning(false);
+    setPhase(next);
+    setMessageSeed(randomSeed());
+    setSecondsLeft(durations[next]);
+  };
+
+  const adjustDuration = (delta: number) => {
+    const next = Math.min(MAX_DURATION_SECONDS, Math.max(MIN_DURATION_SECONDS, total + delta));
+    setDurations({ ...durations, [phase]: next });
+    setSecondsLeft(next);
+  };
+
+  const isFresh = secondsLeft === total;
 
   const primaryLabel = isRunning
     ? '一時停止'
@@ -130,10 +161,7 @@ export function PomodoroPage() {
   const accent = phase === 'work' ? '#6b8afd' : '#4dbf8a';
   const bgColor = phase === 'work' ? '#fdeceb' : '#eaf3fb';
 
-  const elapsed = total - secondsLeft;
-  const brackets = phase === 'work' ? WORK_MESSAGE_BRACKETS : BREAK_MESSAGE_BRACKETS;
-  const bracketIndex = Math.floor(elapsed / MESSAGE_INTERVAL_SECONDS) % brackets.length;
-  const message = pickMessage(brackets[bracketIndex], bracketIndex);
+  const message = pickMessage(phase, progress, messageSeed, secondsLeft);
 
   return (
     <div className="min-h-screen transition-colors duration-500" style={{ background: bgColor }}>
@@ -156,15 +184,47 @@ export function PomodoroPage() {
         </button>
 
         <div className="flex flex-col items-center gap-4 max-md:landscape:gap-2">
+          <div role="group" aria-label="フェーズ" className="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+            {PHASES.map((p) => (
+              <button
+                key={p}
+                onClick={() => selectPhase(p)}
+                aria-pressed={phase === p}
+                className="px-4 py-1 max-md:landscape:px-3 max-md:landscape:py-0.5 rounded-full text-sm transition-colors"
+                style={phase === p ? { background: accent, color: '#fff' } : { color: '#6b7280' }}
+              >
+                {PHASE_LABEL[p]}
+              </button>
+            ))}
+          </div>
+
           <div className="relative bg-white rounded-2xl px-6 py-4 max-md:landscape:px-4 max-md:landscape:py-2 shadow-sm border border-gray-200 max-w-[260px] max-md:landscape:max-w-[200px] text-base max-md:landscape:text-sm text-gray-700 text-center">
             {message}
             <div className="absolute top-1/2 -left-[9px] -translate-y-1/2 w-4 h-4 bg-white border-l border-b border-gray-200 rotate-45 hidden max-md:landscape:block md:block" />
             <div className="absolute left-1/2 -top-[9px] -translate-x-1/2 w-4 h-4 bg-white border-l border-t border-gray-200 rotate-45 max-md:landscape:hidden md:hidden" />
           </div>
 
-          <span className="text-2xl md:text-3xl max-md:landscape:text-xl font-bold tabular-nums" style={{ color: accent }}>
-            {formatTime(secondsLeft)}
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => adjustDuration(-DURATION_STEP_SECONDS)}
+              disabled={total <= MIN_DURATION_SECONDS}
+              aria-label="1分短くする"
+              className={`${adjustButtonClass} ${isRunning ? 'invisible' : ''}`}
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+            <span className="text-2xl md:text-3xl max-md:landscape:text-xl font-bold tabular-nums" style={{ color: accent }}>
+              {formatTime(secondsLeft)}
+            </span>
+            <button
+              onClick={() => adjustDuration(DURATION_STEP_SECONDS)}
+              disabled={total >= MAX_DURATION_SECONDS}
+              aria-label="1分長くする"
+              className={`${adjustButtonClass} ${isRunning ? 'invisible' : ''}`}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 w-64 md:w-72 max-md:landscape:w-40">
             <button
