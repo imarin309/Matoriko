@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, Minus, Plus } from 'lucide-react';
 import { AppHeader } from '../components/header';
 import { PAGE_META } from '../utils/pageMeta';
 
@@ -7,7 +7,7 @@ const BASE_TITLE = PAGE_META['/pomodoro'].title;
 
 type Phase = 'work' | 'break';
 
-const DURATIONS: Record<Phase, number> = {
+const DEFAULT_DURATIONS: Record<Phase, number> = {
   work: 25 * 60,
   break: 5 * 60,
 };
@@ -16,6 +16,15 @@ const PHASE_LABEL: Record<Phase, string> = {
   work: '作業',
   break: '休憩',
 };
+
+const PHASES: Phase[] = ['work', 'break'];
+
+const DURATION_STEP_SECONDS = 60;
+const MIN_DURATION_SECONDS = 1 * 60;
+const MAX_DURATION_SECONDS = 90 * 60;
+
+const adjustButtonClass =
+  'flex items-center justify-center w-7 h-7 rounded-full bg-white border border-gray-200 text-gray-500 shadow-sm disabled:opacity-40';
 
 const WORK_MESSAGES_25 = ['ぽよー！！']; 
 const WORK_MESSAGES_20 = ['頑張っててえらいぽよねえ'];     
@@ -76,7 +85,8 @@ function playChime() {
 
 export function PomodoroPage() {
   const [phase, setPhase] = useState<Phase>('work');
-  const [secondsLeft, setSecondsLeft] = useState(DURATIONS.work);
+  const [durations, setDurations] = useState(DEFAULT_DURATIONS);
+  const [secondsLeft, setSecondsLeft] = useState(DEFAULT_DURATIONS.work);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -90,7 +100,7 @@ export function PomodoroPage() {
           setIsRunning(false);
           setPhase((prevPhase) => {
             const nextPhase: Phase = prevPhase === 'work' ? 'break' : 'work';
-            setSecondsLeft(DURATIONS[nextPhase]);
+            setSecondsLeft(durations[nextPhase]);
             return nextPhase;
           });
           return 0;
@@ -102,7 +112,7 @@ export function PomodoroPage() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isRunning]);
+  }, [isRunning, durations]);
 
   useEffect(() => {
     // 基準となるタイトルは pageMeta に集約し、計測中だけ残り時間を前置きする。
@@ -112,12 +122,24 @@ export function PomodoroPage() {
       : BASE_TITLE;
   }, [isRunning, secondsLeft, phase]);
 
-  const total = DURATIONS[phase];
+  const total = durations[phase];
   const progress = (total - secondsLeft) / total;
 
   const handleToggle = () => setIsRunning((v) => !v);
 
-  const isFresh = secondsLeft === DURATIONS[phase];
+  const selectPhase = (next: Phase) => {
+    setIsRunning(false);
+    setPhase(next);
+    setSecondsLeft(durations[next]);
+  };
+
+  const adjustDuration = (delta: number) => {
+    const next = Math.min(MAX_DURATION_SECONDS, Math.max(MIN_DURATION_SECONDS, total + delta));
+    setDurations({ ...durations, [phase]: next });
+    setSecondsLeft(next);
+  };
+
+  const isFresh = secondsLeft === total;
 
   const primaryLabel = isRunning
     ? '一時停止'
@@ -156,15 +178,47 @@ export function PomodoroPage() {
         </button>
 
         <div className="flex flex-col items-center gap-4 max-md:landscape:gap-2">
+          <div role="group" aria-label="フェーズ" className="flex bg-white rounded-full p-1 shadow-sm border border-gray-200">
+            {PHASES.map((p) => (
+              <button
+                key={p}
+                onClick={() => selectPhase(p)}
+                aria-pressed={phase === p}
+                className="px-4 py-1 max-md:landscape:px-3 max-md:landscape:py-0.5 rounded-full text-sm transition-colors"
+                style={phase === p ? { background: accent, color: '#fff' } : { color: '#6b7280' }}
+              >
+                {PHASE_LABEL[p]}
+              </button>
+            ))}
+          </div>
+
           <div className="relative bg-white rounded-2xl px-6 py-4 max-md:landscape:px-4 max-md:landscape:py-2 shadow-sm border border-gray-200 max-w-[260px] max-md:landscape:max-w-[200px] text-base max-md:landscape:text-sm text-gray-700 text-center">
             {message}
             <div className="absolute top-1/2 -left-[9px] -translate-y-1/2 w-4 h-4 bg-white border-l border-b border-gray-200 rotate-45 hidden max-md:landscape:block md:block" />
             <div className="absolute left-1/2 -top-[9px] -translate-x-1/2 w-4 h-4 bg-white border-l border-t border-gray-200 rotate-45 max-md:landscape:hidden md:hidden" />
           </div>
 
-          <span className="text-2xl md:text-3xl max-md:landscape:text-xl font-bold tabular-nums" style={{ color: accent }}>
-            {formatTime(secondsLeft)}
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => adjustDuration(-DURATION_STEP_SECONDS)}
+              disabled={total <= MIN_DURATION_SECONDS}
+              aria-label="1分短くする"
+              className={`${adjustButtonClass} ${isRunning ? 'invisible' : ''}`}
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+            <span className="text-2xl md:text-3xl max-md:landscape:text-xl font-bold tabular-nums" style={{ color: accent }}>
+              {formatTime(secondsLeft)}
+            </span>
+            <button
+              onClick={() => adjustDuration(DURATION_STEP_SECONDS)}
+              disabled={total >= MAX_DURATION_SECONDS}
+              aria-label="1分長くする"
+              className={`${adjustButtonClass} ${isRunning ? 'invisible' : ''}`}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
 
           <div className="flex items-center gap-2 w-64 md:w-72 max-md:landscape:w-40">
             <button
