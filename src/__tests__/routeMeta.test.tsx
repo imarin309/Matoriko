@@ -32,6 +32,32 @@ describe('RouteMeta', () => {
     expect(metaContent('meta[property="og:description"]')).toBe(expected.description);
   });
 
+  it('ルートに対応するmanifestとホーム画面用の名前・アイコンに切り替える', () => {
+    document.head.insertAdjacentHTML(
+      'beforeend',
+      `
+      <link rel="manifest" href="/manifest.json" />
+      <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      <meta name="apple-mobile-web-app-title" content="Matoriko" />
+    `
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/diary/']}>
+        <RouteMeta />
+      </MemoryRouter>
+    );
+
+    const head = document.head;
+    expect(head.querySelector('link[rel="manifest"]')?.getAttribute('href')).toBe(
+      '/manifests/diary.webmanifest'
+    );
+    expect(head.querySelector('link[rel="apple-touch-icon"]')?.getAttribute('href')).toBe(
+      '/icons/apps/diary-192.png'
+    );
+    expect(metaContent('meta[name="apple-mobile-web-app-title"]')).toBe('diary');
+  });
+
   it('ページ側のtitle操作とぶつからない（/pomodoro）', () => {
     render(
       <MemoryRouter initialEntries={['/pomodoro']}>

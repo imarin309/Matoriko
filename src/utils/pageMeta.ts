@@ -1,6 +1,10 @@
 export interface PageMeta {
   title: string;
   description: string;
+  /** ホーム画面に追加したときのアプリ名。ランチャーの表記に合わせる */
+  shortName: string;
+  /** `${iconPrefix}-192.png` と `${iconPrefix}-512.png` を用意する */
+  iconPrefix: string;
 }
 
 export const SITE_NAME = 'Matoriko';
@@ -9,6 +13,8 @@ export const DEFAULT_META: PageMeta = {
   title: 'Matoriko | 自分の心を書き出すメモアプリ',
   description:
     'マインドマップ、心のメモ、日記、絵日記、旅のしおり、メッセージカード、タイマー。自分の心を書き出して整理するためのメモアプリです。',
+  shortName: SITE_NAME,
+  iconPrefix: '/icons/icon',
 };
 
 export const PAGE_META: Record<string, PageMeta> = {
@@ -17,56 +23,81 @@ export const PAGE_META: Record<string, PageMeta> = {
     title: 'mind-map | Matoriko',
     description:
       '頭の中の考えを枝分かれさせて整理するマインドマップ。思いついた言葉をノードに書き足しながら広げて、そのままMarkdownで保存できます。',
+    shortName: 'mind-map',
+    iconPrefix: '/icons/icon',
   },
   '/mind-memo': {
     title: 'mind-memo | Matoriko',
     description:
       '心のひっかかりを言葉にするメモ。問いに順番に答えていくだけで、そのときの気持ちと考え方を整理して、1枚の画像として残せます。',
+    shortName: 'mind-memo',
+    iconPrefix: '/icons/apps/mind-memo',
   },
   '/diary': {
     title: 'diary | Matoriko',
     description:
       '一日の終わりにできごとや気持ちを書きとめる日記。日付ごとに記録して、テキストファイルとして手元に保存できます。',
+    shortName: 'diary',
+    iconPrefix: '/icons/apps/diary',
   },
   '/memory': {
     title: 'memory | Matoriko',
     description:
       '写真と言葉でつづる絵日記。お気に入りの画像に短い言葉をそえて並べ、思い出を1枚の画像として保存できます。',
+    shortName: 'memory',
+    iconPrefix: '/icons/apps/memory',
   },
   '/travel': {
     title: 'travel | Matoriko',
     description:
       '日程と持ち物をまとめる旅のしおり。日ごとのスケジュールと持ち物リストをつくって、旅の計画を1ページに整理できます。',
+    shortName: 'travel',
+    iconPrefix: '/icons/apps/travel',
   },
   '/message': {
     title: 'message | Matoriko',
     description:
       '気持ちを伝えるメッセージカードをつくるツール。背景色やスタンプ、フォントを選んで、そのまま画像として保存・共有できます。',
+    shortName: 'message',
+    iconPrefix: '/icons/apps/message',
   },
   '/pomodoro': {
     title: '25timer | Matoriko',
     description:
       '25分の集中と5分の休憩をくり返すポモドーロタイマー。応援メッセージにはげまされながら、作業のリズムを整えられます。',
+    shortName: '25timer',
+    iconPrefix: '/icons/apps/pomodoro',
   },
   '/shelf': {
     title: 'shelf | Matoriko',
     description:
       'しんどいことを短い付箋に書いて、「今は置いとく」「もういい」「よくわからない」の3つの箱に放り込むページ。考えずに、仕分けるだけで終われます。',
+    shortName: 'shelf',
+    iconPrefix: '/icons/apps/shelf',
   },
   '/murmur': {
     title: 'murmur | Matoriko',
     description:
       '思ったことを一言ずつ書いていくページ。返事は返ってきません。書いたものは古いものから静かに薄くなっていくので、まとまった文章を書く体力がないときにどうぞ。',
+    shortName: 'murmur',
+    iconPrefix: '/icons/apps/murmur',
   },
   '/scrap-word': {
     title: 'scrap | Matoriko',
     description:
       '思ったことをそのまま書き出すページ。整理も答えもいりません。書き終えたら紙をくしゃくしゃに丸めて捨てるように、書いたものは消えます。',
+    shortName: 'scrap',
+    iconPrefix: '/icons/apps/scrap-word',
   },
 };
 
-export function metaForPath(pathname: string): PageMeta {
+/** 未登録のパスはトップページ（'/'）として扱う */
+export function pageKeyForPath(pathname: string): string {
   const normalized =
     pathname.length > 1 && pathname.endsWith('/') ? pathname.replace(/\/+$/, '') : pathname;
-  return PAGE_META[normalized] ?? DEFAULT_META;
+  return Object.hasOwn(PAGE_META, normalized) ? normalized : '/';
+}
+
+export function metaForPath(pathname: string): PageMeta {
+  return PAGE_META[pageKeyForPath(pathname)];
 }

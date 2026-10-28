@@ -46,6 +46,16 @@ make clean           # ビルド成果物を削除（dist、dist-ssr、.viteキ�
 ### メタ情報（title / description）
 SPAのため、ページごとの`title`と`meta description`は`src/components/RouteMeta.tsx`が`useLocation`を見て実行時に書き換える。文言は`src/utils/pageMeta.ts`の`PAGE_META`に集約されており、ページ追加時はここにルートを追加する（未登録のパスは`DEFAULT_META`にフォールバック）。`index.html`には初期表示用（およびog:）のタグを置いている。
 
+### ホーム画面への追加（機能ごとのPWA）
+各機能を別アプリとしてホーム画面に追加できるよう、`vite.config.ts`のプラグインがビルド時に`PAGE_META`から次を出力する。
+
+- `manifests/<機能>.webmanifest`（`id` = `start_url` = `scope` = 機能のパス。トップページのみ従来どおり`/manifest.json`）
+- `<機能>.html`（`index.html`のmanifest・アイコン・アプリ名・title・descriptionを差し替えたもの）
+
+iOSはJSで書き換える前のmanifestを使うことがあるため、初期HTMLの時点で正しい値にしている。Cloudflare Pagesは`/diary`に`diary.html`を返し、存在するファイルは`_redirects`のSPAフォールバックより優先される。SPA内遷移では`RouteMeta`が同じ値に差し替える。
+
+ページ追加時は`PAGE_META`に`shortName`（ランチャーの表記）と`iconPrefix`も設定し、`public/icons/apps/<機能>-192.png`と`-512.png`を置く。アイコンは正方形・白背景で、絵柄を中央に72%程度で配置する（iOSは透過部分を黒く塗り、Androidのmaskableは外周が切られるため）。
+
 ### 状態管理パターン
 マインドマップのツリー構造には**イミュータブルな状態更新**を使用している。`src/domain/mindmap.tsx`の全操作（追加、削除、更新）は既存のノードを変更せず、新しいノードツリーを作成する。
 
